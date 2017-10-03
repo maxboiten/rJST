@@ -26,6 +26,7 @@ USA
 
 ***********************************************************************/
 
+#include <Rcpp.h>
 #include <stdio.h>
 #include <string>
 #include <map>
