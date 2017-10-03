@@ -30,6 +30,7 @@ USA
 #include "document.h"
 #include "model.h"
 #include "map_type.h"
+#include <Rcpp.h>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
