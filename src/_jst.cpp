@@ -49,7 +49,7 @@ string intToString (int a)
 }
 
 // [[Rcpp::export]]
-Rcpp::List jstcpp(string model_status_str,
+Rcpp::List jstcpp(std::string model_status_str,
         Rcpp::List corpus,
         Rcpp::List sentiLexList,
         int numSentiLabs,
