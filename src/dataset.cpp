@@ -128,7 +128,7 @@ void dataset::read_corpus(Rcpp::List corpus) {
 	}
 
 	for (Rcpp::List::iterator it = corpus.begin(); it != corpus.end(); it++) {
-		copy(it->begin(),it->end(),docv.begin());
+		docv = Rcpp::as<vector<int> >(*it);
 		document * pdoc = new document(docv);
 
 		add_doc(pdoc,docCount);
@@ -151,7 +151,7 @@ void dataset::read_senti_lexicon(Rcpp::List sentiLexList) {
 	sentiLex.clear();
 
 	for (Rcpp::List::iterator it = sentiLexList.begin(); it != sentiLexList.end(); it++) {
-		sentiLexLine = *it;
+		sentiLexLine = Rcpp::as<vector<double> >(*it);
 		wordID = (int)sentiLexLine[0];
 		
 		for (int i = 1; i < (int)sentiLexLine.size();i++) {
