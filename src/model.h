@@ -45,7 +45,6 @@ USA
 #include "utils.h"
 #include "math_func.h"
 #include "polya_fit_simple.h"
-#include "strtokenizer.h"
 
 using namespace std;
 
