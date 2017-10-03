@@ -28,6 +28,7 @@ USA
 
 
 #include "model.h"
+#include <Rcpp.h>
 using namespace std;
 
 
