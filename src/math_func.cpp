@@ -1,4 +1,5 @@
-#include "math_func.h"
+#include "math_func.h
+#include <Rcpp.h>
 #include <cstdlib>
 #include <iostream>
 #include <iomanip>
