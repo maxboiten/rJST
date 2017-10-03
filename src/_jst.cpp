@@ -26,7 +26,7 @@ USA
 
 ***********************************************************************/
 
-#include "Rcpp.h"
+#include <Rcpp.h>
 #include "model.h"
 //#include "inference.h"
 #include "utils.h"
