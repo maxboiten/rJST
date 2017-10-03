@@ -30,7 +30,6 @@ USA
 #include "document.h"
 #include "model.h"
 #include "map_type.h"
-#include "strtokenizer.h"
 #include <iostream>
 #include <iomanip>
 #include <fstream>
