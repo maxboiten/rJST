@@ -28,6 +28,7 @@ USA
 
 #include "polya_fit_simple.h"
 #include "math_func.h"
+#include <Rcpp.h>
 #include <math.h>
 #include <iostream>
 #include <string>
