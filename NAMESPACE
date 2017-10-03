@@ -1,0 +1,3 @@
+useDynLib(rJST)
+importFrom(Rcpp, evalCpp)
+exportPattern("^[[:alpha:]]+")
