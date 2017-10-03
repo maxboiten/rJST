@@ -15,7 +15,7 @@ jst <- function(tokens,sentiLex=list(),
   res <- jstcpp('est',tokens,sentiLex,numSentiLabs, numTopics, numIters, updateParaStep,alpha,beta,gamma)
 
   #prepare doc sentiment distribution data.frame
-  pi <- as.data.frame(res$pi)
+  pi <- as.data.frame(res['pi'])
   pi <- as.data.frame(t(pi))
   
   pi.names = character(numSentiLabs)
@@ -26,7 +26,7 @@ jst <- function(tokens,sentiLex=list(),
   rownames(pi) <- names(tokens_uk)
   
   #prepare word topic/sentiment distribtuion data.frame
-  phi <- as.data.frame(res$phi)
+  phi <- as.data.frame(res['phi'])
   
   phi.names = character(numSentiLabs*numTopics)
   for (i in c(1:numSentiLabs)) {
