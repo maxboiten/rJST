@@ -128,7 +128,7 @@ void dataset::read_corpus(Rcpp::List corpus) {
 	}
 
 	for (Rcpp::List::iterator it = corpus.begin(); it != corpus.end(); it++) {
-		docv = *it;
+		copy(it->begin(),it->end(),docv.begin());
 		document * pdoc = new document(docv);
 
 		add_doc(pdoc,docCount);
