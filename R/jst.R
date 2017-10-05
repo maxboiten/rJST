@@ -4,7 +4,7 @@ is.JST.result <- function(x) {
   return(inherits(x,'JST.result'))
 }
 
-jst2 <- function(tokens,sentiLexInput=list(),
+jst <- function(tokens,sentiLexInput=list(),
                 numSentiLabs = 3,
                 numTopics = 10,
                 numIters = 3,
