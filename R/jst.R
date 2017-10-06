@@ -1,5 +1,7 @@
+#' @export
 setClass('JST.result',representation(pi = "data.frame", theta = "data.frame", phi = "data.frame",numTopics = "numeric",numSentiments = "numeric",docvars = "data.frame"))
 
+#' @export
 is.JST.result <- function(x) {
   return(inherits(x,'JST.result'))
 }
@@ -17,6 +19,7 @@ is.JST.result <- function(x) {
 #' @param beta Double, hyperparameter for (defaults to)
 #' @param gamma Double, hyperparameter for (defaults to)
 #' @return A JST.result object containing a data.frame for each estimated parameter
+#' @export
 jst <- function(tokens,sentiLexInput=list(),
                 numSentiLabs = 3,
                 numTopics = 10,
@@ -100,6 +103,7 @@ jst <- function(tokens,sentiLexInput=list(),
 #' @param topic Integer
 #' @param sentiment Integer
 #' @return A CharacterVector containing the 20 top words of the topic/sentiment combination
+#' @export
 top20words <- function(x,topic,sentiment) {
   return(topNwords(x,topic,sentiment,20))
 }
@@ -111,6 +115,7 @@ top20words <- function(x,topic,sentiment) {
 #' @param sentiment Integer
 #' @param N Integer, the number of words to be returned
 #' @return A CharacterVector containing the N top words of the topic/sentiment combination
+#' @export
 topNwords <- function(x,topic,sentiment,N) {
   if (!is.JST.result(x)) {
     stop('The input to this function should be a JST results object')
@@ -140,6 +145,7 @@ topNwords <- function(x,topic,sentiment,N) {
 #' @param sentiment2 Integer
 #' @param colourBy (Optional) Character. The name of a variable from the docvars of the original tokens file
 #' @return A ggplot2 scatterplot of the document sentiments
+#' @export
 plot.JST.result <- function(x,sentiment1,sentiment2,colourBy=NULL) {
   if (sentiment1 <= 0 || sentiment2 <= 0) {
     stop('Both sentiment variables need to be positive integers')
