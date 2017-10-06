@@ -4,27 +4,29 @@ is.JST.result <- function(x) {
   return(inherits(x,'JST.result'))
 }
 
+#tralalalalala
+
 jst <- function(tokens,sentiLexInput=list(),
                 numSentiLabs = 3,
                 numTopics = 10,
                 numIters = 3,
-                updateParaStep = -1, 
+                updateParaStep = -1,
                 alpha = -1,
                 beta = -1,
                 gamma = -1) {
-  
+
   if (!any(class(tokens) != 'tokens')) {
     stop('Please input a quanteda tokens object as data.')
   }
-  
+
   if(is.dictionary(sentiLexInput)) {
     sentiLex <- list()
     numSentiLabs_Lex <- length(sentiLexInput)
-    
+
     if (numSentiLabs_Lex > numSentiLabs) {
       stop('The number of sentiment labels in the lexicon is higher than the parameter for the number of sentiment labels')
     }
-    
+
     size <- 1
     for (i in c(1:numSentiLabs_Lex)) {
       for (word in sentiLexInput[[i]]) {
@@ -34,25 +36,25 @@ jst <- function(tokens,sentiLexInput=list(),
         }
       }
     }
-    
+
   }
   else {
     sentiLex = list()
   }
-  
+
   res <- jstcpp('est',tokens,sentiLex,numSentiLabs, numTopics, numIters, updateParaStep,alpha,beta,gamma)
 
   #prepare doc sentiment distribution data.frame
   pi <- as.data.frame(res$pi)
   pi <- as.data.frame(t(pi))
-  
+
   pi.names = character(numSentiLabs)
   for (i in c(1:numSentiLabs)) {
     pi.names[i] <- paste("sent",i,sep="")
   }
   names(pi) <- pi.names
   rownames(pi) <- names(tokens)
-  
+
   #prepare doc sentiment/topic distribution data.frame
   theta <- as.data.frame(res$theta)
   theta.names <- character(length(tokens)*numSentiLabs)
@@ -63,10 +65,10 @@ jst <- function(tokens,sentiLexInput=list(),
     }
   }
   names(theta) <- theta.names
-  
+
   #prepare word topic/sentiment distribtuion data.frame
   phi <- as.data.frame(res$phi)
-  
+
   phi.names = character(numSentiLabs*numTopics)
   for (i in c(1:numSentiLabs)) {
     for (j in c(1:numTopics)) {
@@ -75,9 +77,9 @@ jst <- function(tokens,sentiLexInput=list(),
   }
   names(phi) <- phi.names
   rownames(phi) <- attributes(tokens)$types
-  
+
   result <- new
-  
+
   return(new("JST.result",pi = pi, theta = theta, phi = phi,numTopics=numTopics,numSentiments=numSentiLabs,docvars=attr(tokens,'docvars')))
 }
 
@@ -98,12 +100,12 @@ topNwords <- function(x,topic,sentiment,N) {
   if (sentiment > x@numSentiments) {
     stop(paste('The sentiment [',sentiment,'] specified is too large. The number of sentiments in this results object is ',x@numSentiments,sep=''))
   }
-  
+
   wordScores <- x@phi[paste('topic',topic,'sent',sentiment,sep='')]
   wordScores <- as.numeric(wordScores[,1])
   names(wordScores) <- rownames(x@phi)
   wordScores <- sort(wordScores,decreasing=TRUE)
-  
+
   return(names(wordScores)[1:N])
 }
 
@@ -114,13 +116,13 @@ plot.JST.result <- function(x,sentiment1,sentiment2,colourBy=NULL) {
   if (sentiment1 > x@numSentiments || sentiment2 > x@numSentiments) {
     stop(paste('One or both sentiment arguments are higher than the number of sentiments in the results object (',x@numSentiments,')',sep=''))
   }
-  
+
   sentiment1 <- paste('sent',sentiment1,sep='')
   sentiment2 <- paste('sent',sentiment2,sep='')
   plotData <- cbind(x@pi,x@docvars)
-  
-  
-  
+
+
+
   if (is.null(colourBy)) {
     return(ggplot(plotData,aes_string(sentiment1,sentiment2)) + geom_point())
   }
