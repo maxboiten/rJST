@@ -4,27 +4,40 @@ is.JST.result <- function(x) {
   return(inherits(x,'JST.result'))
 }
 
+
+#' Run a Joint Sentiment Topic model
+#'
+#' @param tokens A quanteda tokens object
+#' @param sentiLexInput Optional: A quanteda dictionary object for semi-supervised learning
+#' @param numSentiLabs Integer, the number of sentiment labels (defaults to 3)
+#' @param numTopics Integer, the number of topics (defaults to 10)
+#' @param numIters Integer, the number of iterations (defaults to ???)
+#' @param updateParaStep Integer. The number of iterations between optimizations of hyperparameter alpha
+#' @param alpha Double, hyperparameter for (defaults to)
+#' @param beta Double, hyperparameter for (defaults to)
+#' @param gamma Double, hyperparameter for (defaults to)
+#' @return A JST.result object containing a data.frame for each estimated parameter
 jst <- function(tokens,sentiLexInput=list(),
                 numSentiLabs = 3,
                 numTopics = 10,
                 numIters = 3,
-                updateParaStep = -1, 
+                updateParaStep = -1,
                 alpha = -1,
                 beta = -1,
                 gamma = -1) {
-  
+
   if (!any(class(tokens) != 'tokens')) {
     stop('Please input a quanteda tokens object as data.')
   }
-  
+
   if(is.dictionary(sentiLexInput)) {
     sentiLex <- list()
     numSentiLabs_Lex <- length(sentiLexInput)
-    
+
     if (numSentiLabs_Lex > numSentiLabs) {
       stop('The number of sentiment labels in the lexicon is higher than the parameter for the number of sentiment labels')
     }
-    
+
     size <- 1
     for (i in c(1:numSentiLabs_Lex)) {
       for (word in sentiLexInput[[i]]) {
@@ -34,25 +47,25 @@ jst <- function(tokens,sentiLexInput=list(),
         }
       }
     }
-    
+
   }
   else {
     sentiLex = list()
   }
-  
+
   res <- jstcpp('est',tokens,sentiLex,numSentiLabs, numTopics, numIters, updateParaStep,alpha,beta,gamma)
 
   #prepare doc sentiment distribution data.frame
   pi <- as.data.frame(res$pi)
   pi <- as.data.frame(t(pi))
-  
+
   pi.names = character(numSentiLabs)
   for (i in c(1:numSentiLabs)) {
     pi.names[i] <- paste("sent",i,sep="")
   }
   names(pi) <- pi.names
   rownames(pi) <- names(tokens)
-  
+
   #prepare doc sentiment/topic distribution data.frame
   theta <- as.data.frame(res$theta)
   theta.names <- character(length(tokens)*numSentiLabs)
@@ -63,10 +76,10 @@ jst <- function(tokens,sentiLexInput=list(),
     }
   }
   names(theta) <- theta.names
-  
+
   #prepare word topic/sentiment distribtuion data.frame
   phi <- as.data.frame(res$phi)
-  
+
   phi.names = character(numSentiLabs*numTopics)
   for (i in c(1:numSentiLabs)) {
     for (j in c(1:numTopics)) {
@@ -75,16 +88,29 @@ jst <- function(tokens,sentiLexInput=list(),
   }
   names(phi) <- phi.names
   rownames(phi) <- attributes(tokens)$types
-  
+
   result <- new
-  
+
   return(new("JST.result",pi = pi, theta = theta, phi = phi,numTopics=numTopics,numSentiments=numSentiLabs,docvars=attr(tokens,'docvars')))
 }
 
+#' Show the top 20 words for a topic/sentiment combination
+#'
+#' @param x A JST.result object
+#' @param topic Integer
+#' @param sentiment Integer
+#' @return A CharacterVector containing the 20 top words of the topic/sentiment combination
 top20words <- function(x,topic,sentiment) {
   return(topNwords(x,topic,sentiment,20))
 }
 
+#' Show the top N words for a topic/sentiment combination
+#'
+#' @param x A JST.result object
+#' @param topic Integer
+#' @param sentiment Integer
+#' @param N Integer, the number of words to be returned
+#' @return A CharacterVector containing the N top words of the topic/sentiment combination
 topNwords <- function(x,topic,sentiment,N) {
   if (!is.JST.result(x)) {
     stop('The input to this function should be a JST results object')
@@ -98,15 +124,22 @@ topNwords <- function(x,topic,sentiment,N) {
   if (sentiment > x@numSentiments) {
     stop(paste('The sentiment [',sentiment,'] specified is too large. The number of sentiments in this results object is ',x@numSentiments,sep=''))
   }
-  
+
   wordScores <- x@phi[paste('topic',topic,'sent',sentiment,sep='')]
   wordScores <- as.numeric(wordScores[,1])
   names(wordScores) <- rownames(x@phi)
   wordScores <- sort(wordScores,decreasing=TRUE)
-  
+
   return(names(wordScores)[1:N])
 }
 
+#' Plot document sentiment scores
+#'
+#' @param x A JST.result object
+#' @param sentiment1 Integer
+#' @param sentiment2 Integer
+#' @param colourBy (Optional) Character. The name of a variable from the docvars of the original tokens file
+#' @return A ggplot2 scatterplot of the document sentiments
 plot.JST.result <- function(x,sentiment1,sentiment2,colourBy=NULL) {
   if (sentiment1 <= 0 || sentiment2 <= 0) {
     stop('Both sentiment variables need to be positive integers')
@@ -114,13 +147,13 @@ plot.JST.result <- function(x,sentiment1,sentiment2,colourBy=NULL) {
   if (sentiment1 > x@numSentiments || sentiment2 > x@numSentiments) {
     stop(paste('One or both sentiment arguments are higher than the number of sentiments in the results object (',x@numSentiments,')',sep=''))
   }
-  
+
   sentiment1 <- paste('sent',sentiment1,sep='')
   sentiment2 <- paste('sent',sentiment2,sep='')
   plotData <- cbind(x@pi,x@docvars)
-  
-  
-  
+
+
+
   if (is.null(colourBy)) {
     return(ggplot(plotData,aes_string(sentiment1,sentiment2)) + geom_point())
   }
