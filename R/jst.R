@@ -4,8 +4,19 @@ is.JST.result <- function(x) {
   return(inherits(x,'JST.result'))
 }
 
-#tralalalalala
 
+#' Run a Joint Sentiment Topic model
+#'
+#' @param tokens A quanteda tokens object
+#' @param sentiLexInput Optional: A quanteda dictionary object for semi-supervised learning
+#' @param numSentiLabs Integer, the number of sentiment labels (defaults to 3)
+#' @param numTopics Integer, the number of topics (defaults to 10)
+#' @param numIters Integer, the number of iterations (defaults to ???)
+#' @param updateParaStep Integer. The number of iterations between optimizations of hyperparameter alpha
+#' @param alpha Double, hyperparameter for (defaults to)
+#' @param beta Double, hyperparameter for (defaults to)
+#' @param gamma Double, hyperparameter for (defaults to)
+#' @return A JST.result object containing a data.frame for each estimated parameter
 jst <- function(tokens,sentiLexInput=list(),
                 numSentiLabs = 3,
                 numTopics = 10,
@@ -83,10 +94,23 @@ jst <- function(tokens,sentiLexInput=list(),
   return(new("JST.result",pi = pi, theta = theta, phi = phi,numTopics=numTopics,numSentiments=numSentiLabs,docvars=attr(tokens,'docvars')))
 }
 
+#' Show the top 20 words for a topic/sentiment combination
+#'
+#' @param x A JST.result object
+#' @param topic Integer
+#' @param sentiment Integer
+#' @return A CharacterVector containing the 20 top words of the topic/sentiment combination
 top20words <- function(x,topic,sentiment) {
   return(topNwords(x,topic,sentiment,20))
 }
 
+#' Show the top N words for a topic/sentiment combination
+#'
+#' @param x A JST.result object
+#' @param topic Integer
+#' @param sentiment Integer
+#' @param N Integer, the number of words to be returned
+#' @return A CharacterVector containing the N top words of the topic/sentiment combination
 topNwords <- function(x,topic,sentiment,N) {
   if (!is.JST.result(x)) {
     stop('The input to this function should be a JST results object')
