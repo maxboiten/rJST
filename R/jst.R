@@ -133,6 +133,13 @@ topNwords <- function(x,topic,sentiment,N) {
   return(names(wordScores)[1:N])
 }
 
+#' Plot document sentiment scores
+#'
+#' @param x A JST.result object
+#' @param sentiment1 Integer
+#' @param sentiment2 Integer
+#' @param colourBy (Optional) Character. The name of a variable from the docvars of the original tokens file
+#' @return A ggplot2 scatterplot of the document sentiments
 plot.JST.result <- function(x,sentiment1,sentiment2,colourBy=NULL) {
   if (sentiment1 <= 0 || sentiment2 <= 0) {
     stop('Both sentiment variables need to be positive integers')
