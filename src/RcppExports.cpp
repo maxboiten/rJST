@@ -6,7 +6,7 @@
 using namespace Rcpp;
 
 // jstcpp
-int jstcpp(std::string model_status_str, Rcpp::List corpus, Rcpp::List sentiLexList, int numSentiLabs, int numTopics, int numiters, int updateParaStep, double alpha_, double beta_, double gamma_);
+Rcpp::List jstcpp(std::string model_status_str, Rcpp::List corpus, Rcpp::List sentiLexList, int numSentiLabs, int numTopics, int numiters, int updateParaStep, double alpha_, double beta_, double gamma_);
 RcppExport SEXP _rJST_jstcpp(SEXP model_status_strSEXP, SEXP corpusSEXP, SEXP sentiLexListSEXP, SEXP numSentiLabsSEXP, SEXP numTopicsSEXP, SEXP numitersSEXP, SEXP updateParaStepSEXP, SEXP alpha_SEXP, SEXP beta_SEXP, SEXP gamma_SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
