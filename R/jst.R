@@ -1,3 +1,5 @@
+#' @useDynLib rJST
+
 #' @export
 setClass('JST.result',representation(pi = "data.frame", theta = "data.frame", phi = "data.frame",numTopics = "numeric",numSentiments = "numeric",docvars = "data.frame"))
 
