@@ -49,7 +49,7 @@ jst <- function(tokens,sentiLexInput=list(),
         if(word %in% attributes(tokens)$types) {
           #Note below the addition of an extra colum for the neutral probability.
           #Calculation done according to Lin, Ibeke, Wyner and Guerin, 2015. (lambda = {.9 if w in lexicon, .05 if w not in lexicon})
-          #Adjusted for more than two sentiments by replacing .05 by .1/numSentiLabs_Lex
+          #Adjusted for more than three sentiments (including neutal) by replacing .05 by .1/numSentiLabs_Lex
           sentiLex[[size]] <- c(match(word,attributes(tokens)$types),
               rep(0.1/numSentiLabs_Lex,i),
               0.9,
