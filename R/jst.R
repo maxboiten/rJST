@@ -1,7 +1,7 @@
 #' @useDynLib rJST
 
 #' @export
-setClass('JST.result',representation(pi = "data.frame", theta = "data.frame", phi = "data.frame",numTopics = "numeric",numSentiments = "numeric",docvars = "data.frame"))
+setClass('JST.result',representation(pi = "data.frame", theta = "data.frame", phi = "data.frame",phi.termScores = "data.frame",numTopics = "numeric",numSentiments = "numeric",docvars = "data.frame"))
 
 #' @export
 is.JST.result <- function(x) {
@@ -100,9 +100,23 @@ jst <- function(tokens,sentiLexInput=list(),
   names(phi) <- phi.names
   rownames(phi) <- attributes(tokens)$types
 
-  result <- new
+  phi.termScores <- phi
 
-  return(new("JST.result",pi = pi, theta = theta, phi = phi,numTopics=numTopics,numSentiments=numSentiLabs,docvars=attr(tokens,'docvars')))
+  for (i in c(1:nrow(phi.termScores))) {
+    product <- prod(phi.termScores[i,])^(1/ncol(phi.termScores))
+    for (j in c(1:ncol(phi.termScores))) {
+      phi.termScores[i,j] <- phi.termScores[i,j]*log(phi.termScores[i,j]/product)
+    }
+  }
+
+  return(new("JST.result",
+    pi = pi,
+    theta = theta,
+    phi = phi,
+    phi.termScores = phi.termScores,
+    numTopics=numTopics,
+    numSentiments=numSentiLabs,
+    docvars=attr(tokens,'docvars')))
 }
 
 #' Show the top 20 words for a topic/sentiment combination
