@@ -124,10 +124,12 @@ jst <- function(tokens,sentiLexInput=list(),
 #' @param x A JST.result object
 #' @param topic Integer
 #' @param sentiment Integer
+#' @param termScores Boolean. TRUE is you wish to use term scores (Lafferty and Blei, 2009)
+#'        rather than the phi parameter as estimated by JST. Defaults to TRUE.
 #' @return A CharacterVector containing the 20 top words of the topic/sentiment combination
 #' @export
-top20words <- function(x,topic,sentiment) {
-  return(topNwords(x,topic,sentiment,20))
+top20words <- function(x,topic,sentiment,termScores = TRUE) {
+  return(topNwords(x,topic,sentiment,20,termScores))
 }
 
 #' Show the top N words for a topic/sentiment combination
@@ -136,9 +138,11 @@ top20words <- function(x,topic,sentiment) {
 #' @param topic Integer
 #' @param sentiment Integer
 #' @param N Integer, the number of words to be returned
+#' @param termScores Boolean. TRUE is you wish to use term scores (Lafferty and Blei, 2009)
+#'        rather than the phi parameter as estimated by JST. Defaults to TRUE.
 #' @return A CharacterVector containing the N top words of the topic/sentiment combination
 #' @export
-topNwords <- function(x,topic,sentiment,N) {
+topNwords <- function(x,topic,sentiment,N,termScores = TRUE) {
   if (!is.JST.result(x)) {
     stop('The input to this function should be a JST results object')
   }
@@ -152,9 +156,14 @@ topNwords <- function(x,topic,sentiment,N) {
     stop(paste('The sentiment [',sentiment,'] specified is too large. The number of sentiments in this results object is ',x@numSentiments,sep=''))
   }
 
-  wordScores <- x@phi[paste('topic',topic,'sent',sentiment,sep='')]
+  if (termScores) {
+    data <- x@phi.termScores
+  } else {
+    data <- x@phi
+  }
+  wordScores <- data[paste('topic',topic,'sent',sentiment,sep='')]
   wordScores <- as.numeric(wordScores[,1])
-  names(wordScores) <- rownames(x@phi)
+  names(wordScores) <- rownames(data)
   wordScores <- sort(wordScores,decreasing=TRUE)
 
   return(names(wordScores)[1:N])
