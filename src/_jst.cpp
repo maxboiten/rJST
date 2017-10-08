@@ -433,7 +433,7 @@ void model::update_Parameters() {
 	// update alpha
 	for (int l = 0; l < numSentiLabs; l++) {
 		for (int z = 0; z < numTopics; z++) {
-			for (int z = 0; d < numDocs; d++) {
+			for (int d = 0; d < numDocs; d++) {
 				data[z][d] = ndlz[d][l][z]; // ntldsum[j][k][m];
 			}
 		}
