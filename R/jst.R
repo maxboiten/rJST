@@ -64,7 +64,7 @@ jst <- function(dfm,sentiLexInput=list(),
     sentiLex = list()
   }
   
-  res <- jstcpp(dfm,sentiLex,numSentiLabs, numTopics, numIters, alpha,beta,gamma)
+  res <- jstcpp(dfm,sentiLex,numSentiLabs, numTopics, numIters, updateParaStep, alpha,beta,gamma)
   
   #prepare doc sentiment distribution data.frame
   docIDs <- attr(dfm,'Dimnames')$docs
