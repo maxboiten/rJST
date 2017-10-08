@@ -4,7 +4,7 @@
 \alias{top20words}
 \title{Show the top 20 words for a topic/sentiment combination}
 \usage{
-top20words(x, topic, sentiment)
+top20words(x, topic, sentiment, termScores = TRUE)
 }
 \arguments{
 \item{x}{A JST.result object}
@@ -12,6 +12,9 @@ top20words(x, topic, sentiment)
 \item{topic}{Integer}
 
 \item{sentiment}{Integer}
+
+\item{termScores}{Boolean. TRUE is you wish to use term scores (Lafferty and Blei, 2009)
+rather than the phi parameter as estimated by JST. Defaults to TRUE.}
 }
 \value{
 A CharacterVector containing the 20 top words of the topic/sentiment combination

@@ -4,12 +4,12 @@
 \alias{jst}
 \title{Run a Joint Sentiment Topic model}
 \usage{
-jst(tokens, sentiLexInput = list(), numSentiLabs = 3, numTopics = 10,
+jst(dfm, sentiLexInput = list(), numSentiLabs = 3, numTopics = 10,
   numIters = 3, updateParaStep = -1, alpha = -1, beta = -1,
   gamma = -1)
 }
 \arguments{
-\item{tokens}{A quanteda tokens object}
+\item{dfm}{A quanteda dfm object}
 
 \item{sentiLexInput}{Optional: A quanteda dictionary object for semi-supervised learning}
 
