@@ -50,12 +50,12 @@ int polya_fit_simple(int ** data, double * alpha, int _K, int _nSample) {
 	double * data_row_sum = NULL; // the sum of the counts of each data sample P = {P_1, P_2,...,P_k}
 	bool sat_state = false;
 	int i, k, j;
-  
+
 	old_alpha = new double[K];
 	for (k = 0; k < K; k++) {
 		old_alpha[k] = 0;
 	}
-  
+
 	data_row_sum = new double[nSample];
 	for (i = 0; i < nSample; i++) {
 		data_row_sum[i] = 0;
@@ -69,14 +69,13 @@ int polya_fit_simple(int ** data, double * alpha, int _K, int _nSample) {
 	}
 
 	// simple fix point iteration
-	printf("Optimising parameters...\n");
 	for (i = 0; i < polya_iter; i++) {  // reset sum_alpha_old
 		sum_alpha_old = 0;
 		// update old_alpha after each iteration
 		for (j = 0; j < K; j++) {
 			old_alpha[j] = *(alpha+j);
 		}
- 
+
 		 // calculate sum_alpha_old
 		 for (j = 0; j < K; j++) {
 			 sum_alpha_old += old_alpha[j];
@@ -110,14 +109,9 @@ int polya_fit_simple(int ** data, double * alpha, int _K, int _nSample) {
 
 		// check whether to terminate the whole iteration
 		if(sat_state) {
-			cout<<"Terminated at iteration: "<<i<<endl;
 			break;
 		}
-		else if(i == polya_iter-1)  cout<<"Haven't converged! Terminated at iteration: "<<i+1<<endl;
 
 	}
-
-	printf("Optimisation done!\n");
-
-    return 0;
+  return 0;
 }
