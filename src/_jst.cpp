@@ -131,6 +131,8 @@ void model::init_parameters() {
 }
 
 void model::init_estimate() {
+  srand(time(NULL));
+
   int document, wordToken, priorSent, topic, sentilab;
   std::map<int,std::vector<double> >::iterator sentiIt;
 
