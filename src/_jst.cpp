@@ -2,6 +2,8 @@
 
 //Class definition of model stored in header file
 
+// [[Rcpp::depends(RcppArmadillo)]]
+
 // [[Rcpp::export]]
 Rcpp::List jstcpp(arma::sp_imat& dfm,
         Rcpp::List& sentiLexList,
@@ -13,7 +15,7 @@ Rcpp::List jstcpp(arma::sp_imat& dfm,
         double beta_,
         double gamma_) {
 
-    model * jst = new model();
+    modeljst * jst = new modeljst();
 
     jst->numTopics = numTopics;
     jst->numSentiLabs = numSentiLabs;
@@ -33,7 +35,7 @@ Rcpp::List jstcpp(arma::sp_imat& dfm,
                              Rcpp::Named("phi.termScores") = jst->termScores());
 }
 
-void model::init(Rcpp::List& sentiLexList) {
+void modeljst::init(Rcpp::List& sentiLexList) {
   std::vector<double> sentiLexEntry, priorProb;
   int wordToken;
 
@@ -59,7 +61,7 @@ void model::init(Rcpp::List& sentiLexList) {
   init_estimate();
 }
 
-void model::init_parameters() {
+void modeljst::init_parameters() {
   topic_dw.resize(numDocs);
   sent_dw.resize(numDocs);
   for (int d = 0; d < numDocs; d++) {
@@ -130,7 +132,7 @@ void model::init_parameters() {
 
 }
 
-void model::init_estimate() {
+void modeljst::init_estimate() {
   srand(time(NULL));
 
   int document, wordToken, priorSent, topic, sentilab;
@@ -172,7 +174,7 @@ void model::init_estimate() {
   }
 }
 
-void model::estimate() {
+void modeljst::estimate() {
   int document, wordToken, topic, sentilab;
   std::vector<int> locations(numDocs);
 
@@ -224,7 +226,7 @@ void model::estimate() {
   compute_phi_lzw();
 }
 
-void model::drawsample(int d, int w, int& topic, int& sentilab) {
+void modeljst::drawsample(int d, int w, int& topic, int& sentilab) {
   double u;
 
   // do multinomial sampling via cumulative method
@@ -268,7 +270,7 @@ void model::drawsample(int d, int w, int& topic, int& sentilab) {
 	if (topic == numTopics) topic--;
 }
 
-void model::set_gamma() {
+void modeljst::set_gamma() {
 
 	if (gamma_ <= 0 ) {
 		gamma_ = (double)aveDocSize * 0.05 / (double)numSentiLabs;
@@ -287,7 +289,7 @@ void model::set_gamma() {
 	}
 }
 
-void model::set_alpha() {
+void modeljst::set_alpha() {
 
   //Set alpha to default
   if (alpha_ <= 0) {
@@ -306,7 +308,7 @@ void model::set_alpha() {
 	}
 }
 
-void model::set_beta() {
+void modeljst::set_beta() {
   std::map<int,std::vector<double> >::iterator sentiIt;
   std::vector<std::vector<double> > lambda_lw;
 
@@ -354,7 +356,7 @@ void model::set_beta() {
 	}
 }
 
-void model::compute_phi_lzw() {
+void modeljst::compute_phi_lzw() {
 	for (int l = 0; l < numSentiLabs; l++)  {
 	  for (int z = 0; z < numTopics; z++) {
 			for(int w = 0; w < vocabSize; w++) {
@@ -364,7 +366,7 @@ void model::compute_phi_lzw() {
 	}
 }
 
-void model::compute_pi_dl() {
+void modeljst::compute_pi_dl() {
 	for (int d = 0; d < numDocs; d++) {
 	    for (int l = 0; l < numSentiLabs; l++) {
 		    pi_dl[d][l] = (ndl[d][l] + gamma_dl[d][l]) / (nd[d] + gammaSum_d[d]);
@@ -372,7 +374,7 @@ void model::compute_pi_dl() {
 	}
 }
 
-void model::compute_theta_dlz() {
+void modeljst::compute_theta_dlz() {
 	for (int d = 0; d < numDocs; d++) {
 	  for (int l = 0; l < numSentiLabs; l++)  {
 			for (int z = 0; z < numTopics; z++) {
@@ -382,7 +384,7 @@ void model::compute_theta_dlz() {
 	}
 }
 
-std::vector<std::vector<std::vector<double> > > model::termScores() {
+std::vector<std::vector<std::vector<double> > > modeljst::termScores() {
 
   std::vector<std::vector<std::vector<double> > > termScores;
 
@@ -415,7 +417,7 @@ std::vector<std::vector<std::vector<double> > > model::termScores() {
   return termScores;
 }
 
-void model::update_Parameters() {
+void modeljst::update_Parameters() {
 
 	int ** data; // temp valuable for exporting 3-dimentional array to 2-dimentional
 	double * alpha_temp;

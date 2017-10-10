@@ -25,9 +25,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// jstcppreversed
+Rcpp::List jstcppreversed(arma::sp_imat& dfm, Rcpp::List& sentiLexList, int numSentiLabs, int numTopics, int numiters, int updateParaStep, double alpha_, double beta_, double gamma_);
+RcppExport SEXP _rJST_jstcppreversed(SEXP dfmSEXP, SEXP sentiLexListSEXP, SEXP numSentiLabsSEXP, SEXP numTopicsSEXP, SEXP numitersSEXP, SEXP updateParaStepSEXP, SEXP alpha_SEXP, SEXP beta_SEXP, SEXP gamma_SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::sp_imat& >::type dfm(dfmSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List& >::type sentiLexList(sentiLexListSEXP);
+    Rcpp::traits::input_parameter< int >::type numSentiLabs(numSentiLabsSEXP);
+    Rcpp::traits::input_parameter< int >::type numTopics(numTopicsSEXP);
+    Rcpp::traits::input_parameter< int >::type numiters(numitersSEXP);
+    Rcpp::traits::input_parameter< int >::type updateParaStep(updateParaStepSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha_(alpha_SEXP);
+    Rcpp::traits::input_parameter< double >::type beta_(beta_SEXP);
+    Rcpp::traits::input_parameter< double >::type gamma_(gamma_SEXP);
+    rcpp_result_gen = Rcpp::wrap(jstcppreversed(dfm, sentiLexList, numSentiLabs, numTopics, numiters, updateParaStep, alpha_, beta_, gamma_));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rJST_jstcpp", (DL_FUNC) &_rJST_jstcpp, 9},
+    {"_rJST_jstcppreversed", (DL_FUNC) &_rJST_jstcppreversed, 9},
     {NULL, NULL, 0}
 };
 

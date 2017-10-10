@@ -5,3 +5,7 @@ jstcpp <- function(dfm, sentiLexList, numSentiLabs, numTopics, numiters, updateP
     .Call('_rJST_jstcpp', PACKAGE = 'rJST', dfm, sentiLexList, numSentiLabs, numTopics, numiters, updateParaStep, alpha_, beta_, gamma_)
 }
 
+jstcppreversed <- function(dfm, sentiLexList, numSentiLabs, numTopics, numiters, updateParaStep, alpha_, beta_, gamma_) {
+    .Call('_rJST_jstcppreversed', PACKAGE = 'rJST', dfm, sentiLexList, numSentiLabs, numTopics, numiters, updateParaStep, alpha_, beta_, gamma_)
+}
+
