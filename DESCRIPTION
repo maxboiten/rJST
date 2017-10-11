@@ -11,6 +11,7 @@ Description: The package runs a Joint Sentiment Topic model, as described by Lin
 License: GPL-3
 Imports: Rcpp (>= 0.12.12),
     ggplot2,
-    SnowballC
+    SnowballC,
+    quanteda
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 6.0.1
