@@ -5,9 +5,9 @@
 \alias{topNwords}
 \title{Show the top N words for a topic/sentiment combination}
 \usage{
-topNwords(x, topic, sentiment, N, termScores = TRUE)
+topNwords(x, topic, sentiment, N, termScores = FALSE)
 
-topNwords(x, topic, sentiment, N, termScores = TRUE)
+topNwords(x, topic, sentiment, N, termScores = FALSE)
 }
 \arguments{
 \item{x}{A JST.result object}
@@ -19,7 +19,8 @@ topNwords(x, topic, sentiment, N, termScores = TRUE)
 \item{N}{Integer, the number of words to be returned}
 
 \item{termScores}{Boolean. TRUE is you wish to use term scores (Lafferty and Blei, 2009)
-rather than the phi parameter as estimated by JST. Defaults to TRUE.}
+rather than the phi parameter as estimated by JST. Defaults to FALSE since term
+scores have some calculation issues. To be continued...}
 
 \item{x}{A JST.result object}
 
@@ -30,7 +31,8 @@ rather than the phi parameter as estimated by JST. Defaults to TRUE.}
 \item{N}{Integer, the number of words to be returned}
 
 \item{termScores}{Boolean. TRUE is you wish to use term scores (Lafferty and Blei, 2009)
-rather than the phi parameter as estimated by JST. Defaults to TRUE.}
+rather than the phi parameter as estimated by JST. Defaults to FALSE since term
+scores have some calculation issues. To be continued...}
 }
 \value{
 A CharacterVector containing the N top words of the topic/sentiment combination
