@@ -84,14 +84,28 @@ jst_reversed <- function(dfm,sentiLexInput=list(),
   
   #prepare doc topic/sentiment distribution data.frame
   pi <- as.data.frame(res$pi)
-  pi.names <- character(numTopics*numSentiLabs)
-  for (i in c(1:numTopics)) {
-    for (j in c(1:numSentiLabs)) {
-      pi.names[j+numSentiLabs*(i-1)] <- paste("topic",i,"sent",j,sep="")
-    }
+  pi <- as.data.frame(t(pi))
+  
+  pi.names <- character(numSentiLabs)
+  for (i in c(1:numSentiLabs)) {
+    pi.names[i] <- paste('sent',i,sep='')
   }
   names(pi) <- pi.names
-  rownames(pi) <- docIDs
+  
+  pi$docID <- docIDs
+  pi$docID <- as.factor(pi$docID)
+  
+  topic <- numeric()
+  
+  for (i in c(1:numTopics)) {
+    topic <- c(topic,rep(i,dfm@Dim[1]))
+  }
+  
+  pi$topic <- topic
+  
+  pi <- pi[,c('docID','topic',pi.names)]
+  
+  rownames(pi) <- NULL
   
   #prepare word topic/sentiment distribtuion data.frame
   phi <- as.data.frame(res$phi)
@@ -118,52 +132,112 @@ jst_reversed <- function(dfm,sentiLexInput=list(),
              docvars=attr(dfm,'docvars')))
 }
 
-#' Show the top 20 words for a topic/sentiment combination
-#'
-#' @param x A JST.result object
-#' @param topic Integer
-#' @param sentiment Integer
-#' @param termScores Boolean. TRUE is you wish to use term scores (Lafferty and Blei, 2009)
-#'        rather than the phi parameter as estimated by JST. Defaults to TRUE.
-#' @return A CharacterVector containing the 20 top words of the topic/sentiment combination
+#' @rdname topNwords-method
+#' @aliases topNwords,JST_reversed.result,numeric,numeric,numeric-method
+setMethod('topNwords', c('JST_reversed.result','numeric','numeric','numeric'),
+          function(x,N,topic,sentiment) {
+            colname <- paste('topic',topic,'sent',sentiment,sep='')
+            
+            res <- cbind(rownames(x@phi),x@phi[colname])
+            names(res) <- c('word',colname)
+            
+            res <- res[order(res[colname],decreasing= TRUE),]
+            
+            res <- res[1:N,1]
+            res <- as.character(res)
+            res <- as.data.frame(res)
+            names(res) <- colname
+            
+            return(res)
+          })
+
+#' @rdname topNwords-method
+#' @aliases topNwords,JST_reversed.result,numeric,-method
+setMethod('topNwords', c('JST_reversed.result','numeric','missing','missing'),
+          function(x,N,topic,sentiment) {
+            res <- as.data.frame(matrix(ncol = 0, nrow = N))
+            
+            for (topic in c(1:x@numTopics)) {
+              for (sentiment in c(1:x@numSentiments)) {
+                res <- cbind(res,topNwords(x,N,topic,sentiment))
+              }
+            }
+            
+            return(res)
+          })
+
+#' @rdname top20words-method
+#' @aliases top20words,JST_reversed.result,numeric,numeric-method
+setMethod('top20words', c('JST_reversed.result','numeric','numeric'),
+          function(x,topic,sentiment) {
+            return(topNwords(x,20,topic,sentiment))
+          })
+
+#' @rdname top20words-method
+#' @aliases top20words,JST_reversed.result-method
+setMethod('top20words', c('JST_reversed.result','missing','missing'),
+          function(x,topic,sentiment) {
+            return(topNwords(x,20))
+          })
+
+#' Tidy reversed JST results
+#' 
+#' This method tidies up the results object for the selected parameter
+#' and returns a data.frame that conforms to the standards from the
+#' R tidyverse. See \pkg{broom} for the generic tidy method.
+#' 
+#' @param x A JST_reversed.result object
+#' @param parameter Character. The parameter to be tidied and returned. 
+#'        Note that no default is set.
+#' 
+#' @return A tidy data.frame.
+#' 
 #' @export
-top20words <- function(x,topic,sentiment,termScores = TRUE) {
-  return(topNwords(x,topic,sentiment,20,termScores))
+tidy.JST_reversed.result <- function(x,parameter = NULL) {
+  if (is.null(parameter)) {
+    stop('Please specify which parameter from the object you would like to tidy')
+  } else if (parameter == 'pi') {
+    return (tidy.JST_reversed.result.pi(x))
+  } else if (parameter == 'theta') {
+    return (tidy.JST_reversed.result.theta(x))
+  } else if (parameter == 'phi') {
+    return (tidy.JST_reversed.result.phi(x))
+  } else {
+    stop(paste('\'',parameter,'\' is not a valid parameter of the JST_reversed.result model.',sep=''))
+  }
 }
 
-#' Show the top N words for a topic/sentiment combination
-#'
-#' @param x A JST.result object
-#' @param topic Integer
-#' @param sentiment Integer
-#' @param N Integer, the number of words to be returned
-#' @param termScores Boolean. TRUE is you wish to use term scores (Lafferty and Blei, 2009)
-#'        rather than the phi parameter as estimated by JST. Defaults to FALSE since term
-#'        scores have some calculation issues. To be continued...
-#' @return A CharacterVector containing the N top words of the topic/sentiment combination
-#' @export
-topNwords <- function(x,topic,sentiment,N,termScores = FALSE) {
-  if (!is.JST_reversed.result(x)) {
-    stop('The input to this function should be a JST results object')
-  }
-  if (topic <= 0 || sentiment <= 0) {
-    stop('Topic and sentiment should be positive integers')
-  }
-  if (topic > x@numTopics) {
-    stop(paste('The topic [',topic,'] specified is too large. The number of topics in this results object is ',x@numTopics,sep=''))
-  }
-  if (sentiment > x@numSentiments) {
-    stop(paste('The sentiment [',sentiment,'] specified is too large. The number of sentiments in this results object is ',x@numSentiments,sep=''))
-  }
+tidy.JST_reversed.result.pi <- function(x) {
+  res <- x@pi
+  docvars <- x@docvars
+  docvars$docID <- rownames(docvars)
   
-  if (termScores) {
-    data <- x@phi.termScores
-  } else {
-    data <- x@phi
-  }
-  wordScores <- data[,paste('topic',topic,'sent',sentiment,sep='')]
-  names(wordScores) <- rownames(data)
-  wordScores <- sort(wordScores,decreasing=TRUE)
+  res <- merge(docvars,res,by='docID')
   
-  return(names(wordScores)[1:N])
+  return (res)
+}
+
+tidy.JST_reversed.result.theta <- function(x) {
+  docID <- rownames(x@theta)
+  return(cbind(docID,x@docvars,x@theta))
+}
+
+tidy.JST_reversed.result.phi <- function(x) {
+  res <- x@phi
+  
+  res$word <- rownames(res)
+  res$word <- as.factor(res$word)
+  rownames(res) <- NULL
+  
+  res <- melt(res,id='word')
+  
+  variable <- as.character(res$variable)
+  variable <- gsub('topic','',variable)
+  topic <- as.numeric(substr(variable,start=1,stop=regexpr('s',variable)-1))
+  sentiment <- as.numeric(substr(variable,start=regexpr('t',variable)+1,stop=nchar(variable)))
+  
+  res <- cbind(res,topic,sentiment)
+  res <- subset(res,select=c('word','sentiment','topic','value'))
+  
+  return(res)
 }

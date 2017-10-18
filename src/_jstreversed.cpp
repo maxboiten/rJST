@@ -113,13 +113,13 @@ void modeljstrev::init_parameters() {
   set_gamma();
 
   //Result vectors
-  pi_zld.resize(numTopics);
+  pi_zdl.resize(numTopics);
   theta_zd.resize(numTopics);
   for (int z = 0; z < numTopics; z++) {
     theta_zd[z].resize(numDocs);
-    pi_zld[z].resize(numSentiLabs);
-    for (int l = 0; l < numSentiLabs; l++) {
-      pi_zld[z][l].resize(numDocs);
+    pi_zdl[z].resize(numDocs);
+    for (int d = 0; d < numDocs; d++) {
+      pi_zdl[z][d].resize(numSentiLabs);
     }
   }
 
@@ -225,7 +225,7 @@ void modeljstrev::estimate() {
   }
 
   //Compute parameter values
-  compute_pi_zld();
+  compute_pi_zdl();
   compute_theta_zd();
   compute_phi_zlw();
 }
@@ -370,11 +370,11 @@ void modeljstrev::compute_phi_zlw() {
 	}
 }
 
-void modeljstrev::compute_pi_zld() {
+void modeljstrev::compute_pi_zdl() {
 	for (int d = 0; d < numDocs; d++) {
 	  for (int l = 0; l < numSentiLabs; l++) {
       for (int z = 0; z < numTopics; z++) {
-        pi_zld[z][l][d] = (ndlz[d][l][z] + gamma_zl[z][l]) / (ndz[d][z] + gammaSum_z[z]);
+        pi_zdl[z][d][l] = (ndlz[d][l][z] + gamma_zl[z][l]) / (ndz[d][z] + gammaSum_z[z]);
       }
 		}
 	}

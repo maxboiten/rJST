@@ -1,13 +1,18 @@
-#' @useDynLib rJST
+#' @include topNwords.R
 
 #' @export
 setClass('JST.result',representation(pi = "data.frame", theta = "data.frame", phi = "data.frame",phi.termScores = "data.frame",numTopics = "numeric",numSentiments = "numeric",docvars = "data.frame"))
 
+#' Check if an object is a JST.result object
+#' 
+#' @param x object
+#' 
+#' @return Boolean. True if x is a JST.result object.
+#' 
 #' @export
 is.JST.result <- function(x) {
   return(inherits(x,'JST.result'))
 }
-
 
 #' Run a Joint Sentiment Topic model
 #'
@@ -81,13 +86,26 @@ jst <- function(dfm,sentiLexInput=list(),
   
   #prepare doc sentiment/topic distribution data.frame
   theta <- as.data.frame(res$theta)
-  theta.names <- character(length(docIDs)*numSentiLabs)
+  theta <- as.data.frame(t(theta))
+  
+  docID <- character(length(docIDs)*numSentiLabs)
+  sentiment <- numeric(length(docIDs)*numSentiLabs)
+  theta.names <- character(numTopics)
+  
+  for (i in c(1:numTopics)) {
+    theta.names[i] <- paste('topic',i,sep='')
+  }
+  
+  names(theta) <- theta.names
+  
   for (i in c(1:length(docIDs))) {
     for (j in c(1:numSentiLabs)) {
-      theta.names[j+numSentiLabs*(i-1)] <- paste(docIDs[i],"sent",j,sep="")
+      docID[j+numSentiLabs*(i-1)] <- docIDs[i]
+      sentiment[j+numSentiLabs*(i-1)] <- j
     }
   }
-  names(theta) <- theta.names
+  
+  theta <- data.frame(docID,sentiment,theta,row.names=NULL)
   
   #prepare word topic/sentiment distribtuion data.frame
   phi <- as.data.frame(res$phi)
@@ -114,53 +132,111 @@ jst <- function(dfm,sentiLexInput=list(),
              docvars=attr(dfm,'docvars')))
 }
 
-#' Show the top 20 words for a topic/sentiment combination
-#'
+#' @rdname topNwords-method
+#' @aliases topNwords,JST.result,numeric,numeric,numeric-method
+setMethod('topNwords', c('JST.result','numeric','numeric','numeric'),
+          function(x,N,topic,sentiment) {
+            colname <- paste('topic',topic,'sent',sentiment,sep='')
+            
+            res <- cbind(rownames(x@phi),x@phi[colname])
+            names(res) <- c('word',colname)
+            
+            res <- res[order(res[colname],decreasing= TRUE),]
+            
+            res <- res[1:N,1]
+            res <- as.character(res)
+            res <- as.data.frame(res)
+            names(res) <- colname
+            
+            return(res)
+          })
+
+#' @rdname topNwords-method
+#' @aliases topNwords,JST.result,numeric,-method
+setMethod('topNwords', c('JST.result','numeric','missing','missing'),
+          function(x,N,topic,sentiment) {
+            res <- as.data.frame(matrix(ncol = 0, nrow = N))
+            
+            for (topic in c(1:x@numTopics)) {
+              for (sentiment in c(1:x@numSentiments)) {
+                res <- cbind(res,topNwords(x,N,topic,sentiment))
+              }
+            }
+            
+            return(res)
+          })
+
+#' @rdname top20words-method
+#' @aliases top20words,JST.result,numeric,numeric-method
+setMethod('top20words', c('JST.result','numeric','numeric'),
+          function(x,topic,sentiment) {
+            return(topNwords(x,20,topic,sentiment))
+          })
+
+#' @rdname top20words-method
+#' @aliases top20words,JST.result-method
+setMethod('top20words', c('JST.result','missing','missing'),
+          function(x,topic,sentiment) {
+            return(topNwords(x,20))
+          })
+
+#' Tidy JST results
+#' 
+#' This method tidies up the results object for the selected parameter
+#' and returns a data.frame that conforms to the standards from the
+#' R tidyverse. See \pkg{broom} for the generic tidy method.
+#' 
 #' @param x A JST.result object
-#' @param topic Integer
-#' @param sentiment Integer
-#' @param termScores Boolean. TRUE is you wish to use term scores (Lafferty and Blei, 2009)
-#'        rather than the phi parameter as estimated by JST. Defaults to TRUE.
-#' @return A CharacterVector containing the 20 top words of the topic/sentiment combination
+#' @param parameter Character. The parameter to be tidied and returned. 
+#'        Note that no default is set.
+#' 
+#' @return A tidy data.frame.
+#' 
 #' @export
-top20words <- function(x,topic,sentiment,termScores = TRUE) {
-  return(topNwords(x,topic,sentiment,20,termScores))
+tidy.JST.result <- function(x,parameter = NULL) {
+  if (is.null(parameter)) {
+    stop('Please specify which parameter from the object you would like to tidy')
+  } else if (parameter == 'pi') {
+    return (tidy.JST.result.pi(x))
+  } else if (parameter == 'theta') {
+    return (tidy.JST.result.theta(x))
+  } else if (parameter == 'phi') {
+    return (tidy.JST.result.phi(x))
+  } else {
+    stop(paste('\'',parameter,'\' is not a valid parameter of the JST.result model.',sep=''))
+  }
 }
 
-#' Show the top N words for a topic/sentiment combination
-#'
-#' @param x A JST.result object
-#' @param topic Integer
-#' @param sentiment Integer
-#' @param N Integer, the number of words to be returned
-#' @param termScores Boolean. TRUE is you wish to use term scores (Lafferty and Blei, 2009)
-#'        rather than the phi parameter as estimated by JST. Defaults to FALSE since term
-#'        scores have some calculation issues. To be continued...
-#' @return A CharacterVector containing the N top words of the topic/sentiment combination
-#' @export
-topNwords <- function(x,topic,sentiment,N,termScores = FALSE) {
-  if (!is.JST.result(x)) {
-    stop('The input to this function should be a JST results object')
-  }
-  if (topic <= 0 || sentiment <= 0) {
-    stop('Topic and sentiment should be positive integers')
-  }
-  if (topic > x@numTopics) {
-    stop(paste('The topic [',topic,'] specified is too large. The number of topics in this results object is ',x@numTopics,sep=''))
-  }
-  if (sentiment > x@numSentiments) {
-    stop(paste('The sentiment [',sentiment,'] specified is too large. The number of sentiments in this results object is ',x@numSentiments,sep=''))
-  }
+tidy.JST.result.pi <- function(x) {
+  docIDs <- rownames(x@pi)
+  return (cbind(docIDs,x@docvars,x@pi))
+}
+
+tidy.JST.result.theta <- function(x) {
+  res <- x@theta
+  docvars <- x@docvars
+  docvars$docID <- rownames(docvars)
   
-  if (termScores) {
-    data <- x@phi.termScores
-  } else {
-    data <- x@phi
-  }
-  wordScores <- data[paste('topic',topic,'sent',sentiment,sep='')]
-  wordScores <- as.numeric(wordScores[,1])
-  names(wordScores) <- rownames(data)
-  wordScores <- sort(wordScores,decreasing=TRUE)
+  res <- merge(docvars,res,by='docID')
+  return(res)
+}
+
+tidy.JST.result.phi <- function(x) {
+  res <- x@phi
   
-  return(names(wordScores)[1:N])
+  res$word <- rownames(res)
+  res$word <- as.factor(res$word)
+  rownames(res) <- NULL
+  
+  res <- melt(res,id='word')
+  
+  variable <- as.character(res$variable)
+  variable <- gsub('topic','',variable)
+  topic <- as.numeric(substr(variable,start=1,stop=regexpr('s',variable)-1))
+  sentiment <- as.numeric(substr(variable,start=regexpr('t',variable)+1,stop=nchar(variable)))
+  
+  res <- cbind(res,topic,sentiment)
+  res <- subset(res,select=c('word','sentiment','topic','value'))
+  
+  return(res)
 }

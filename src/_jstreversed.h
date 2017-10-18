@@ -58,7 +58,7 @@ public:
   std::vector<double> gammaSum_z;
 
   //Result vectors
-  std::vector<std::vector<std::vector<double> > > pi_zld; // size: (numDocs x L)
+  std::vector<std::vector<std::vector<double> > > pi_zdl; // size: (numDocs x L)
 	std::vector<std::vector<double> > theta_zd; // size: (numDocs x L x T)
 	std::vector<std::vector<std::vector<double> > > phi_zlw; // size: (L x T x V)
 
@@ -66,7 +66,7 @@ public:
   void init_estimate();
   void estimate();
 
-  std::vector<std::vector<std::vector<double> > >  returnPi() { return pi_zld;};
+  std::vector<std::vector<std::vector<double> > >  returnPi() { return pi_zdl;};
   std::vector<std::vector<double> > returnTheta() { return theta_zd;};
   std::vector<std::vector<std::vector<double> > > returnPhi() { return phi_zlw;};
   std::vector<std::vector<std::vector<double> > > termScores();
@@ -77,7 +77,7 @@ private:
   void set_alpha();
   void set_beta();
   void set_gamma();
-  void compute_pi_zld();
+  void compute_pi_zdl();
   void compute_theta_zd();
   void compute_phi_zlw();
   void update_Parameters();

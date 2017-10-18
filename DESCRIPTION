@@ -3,6 +3,7 @@ Type: Package
 Title: Joint Sentiment Topic modelling
 Version: 1.0
 Date: 2017-09-22
+Authors@R: c(person('Max Boiten','Maintainer',email='max_boiten@live.nl'))
 Author: Max Boiten
 Maintainer: Max Boiten <max_boiten@live.nl>
 Description: The package runs a Joint Sentiment Topic model, as described by Lin and He, 2009.
@@ -12,6 +13,16 @@ License: GPL-3
 Imports: Rcpp (>= 0.12.12),
     ggplot2,
     SnowballC,
-    quanteda
+    quanteda,
+    broom,
+    reshape2
+Depends: broom
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 6.0.1
+Collate: 
+    'RcppExports.R'
+    'dictionary.R'
+    'topNwords.R'
+    'jst.R'
+    'jst_reversed.R'
+    'rJST.R'
