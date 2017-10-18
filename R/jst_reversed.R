@@ -1,6 +1,12 @@
 #' @export
 setClass('JST_reversed.result',representation(pi = "data.frame", theta = "data.frame", phi = "data.frame",phi.termScores = "data.frame",numTopics = "numeric",numSentiments = "numeric",docvars = "data.frame"))
 
+#' Check if an object is a JST_reversed.result object
+#' 
+#' @param x object
+#' 
+#' @return Boolean. True if x is a JST_reversed.result object.
+#' 
 #' @export
 is.JST_reversed.result <- function(x) {
   return(inherits(x,'JST_reversed.result'))
