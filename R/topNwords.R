@@ -15,7 +15,7 @@
 #'  data.frame containing the top N words for every topic-sentiment combination.
 #'  
 #' @export
-#' @docType method
+#' @docType methods
 #' @rdname topNwords-method
 setGeneric(name='topNwords', function(x,N,topic=NULL,sentiment=NULL) {
   standardGeneric('topNwords')
@@ -38,7 +38,7 @@ setGeneric(name='topNwords', function(x,N,topic=NULL,sentiment=NULL) {
 #'  data.frame containing the top 20 words for every topic-sentiment combination.
 #'  
 #' @export
-#' @docType method
+#' @docType methods
 #' @rdname top20words-method
 setGeneric(name='top20words',function(x,topic=NULL,sentiment=NULL) {
   standardGeneric('top20words')
