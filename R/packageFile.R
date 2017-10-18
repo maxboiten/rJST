@@ -1,0 +1,3 @@
+#' @useDynLib rJST
+
+# Documentation here

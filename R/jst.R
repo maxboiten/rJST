@@ -134,10 +134,11 @@ top20words <- function(x,topic,sentiment,termScores = TRUE) {
 #' @param sentiment Integer
 #' @param N Integer, the number of words to be returned
 #' @param termScores Boolean. TRUE is you wish to use term scores (Lafferty and Blei, 2009)
-#'        rather than the phi parameter as estimated by JST. Defaults to TRUE.
+#'        rather than the phi parameter as estimated by JST. Defaults to FALSE since term
+#'        scores have some calculation issues. To be continued...
 #' @return A CharacterVector containing the N top words of the topic/sentiment combination
 #' @export
-topNwords <- function(x,topic,sentiment,N,termScores = TRUE) {
+topNwords <- function(x,topic,sentiment,N,termScores = FALSE) {
   if (!is.JST.result(x)) {
     stop('The input to this function should be a JST results object')
   }

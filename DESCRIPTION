@@ -1,13 +1,17 @@
 Package: rJST
 Type: Package
-Title: What the package does (short line)
+Title: Joint Sentiment Topic modelling
 Version: 1.0
 Date: 2017-09-22
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Author: Max Boiten
+Maintainer: Max Boiten <max_boiten@live.nl>
+Description: The package runs a Joint Sentiment Topic model, as described by Lin and He, 2009.
+    Currently, the model can only estimate parameters based on a corpus and not use these estimates
+    for inference.
+License: GPL-3
 Imports: Rcpp (>= 0.12.12),
-    ggplot2
+    ggplot2,
+    SnowballC,
+    quanteda
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 6.0.1
