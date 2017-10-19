@@ -153,8 +153,8 @@ setMethod('topNwords', c('JST.result','numeric','numeric','numeric'),
 
 #' @rdname topNwords-method
 #' @aliases topNwords,JST.result,numeric,-method
-setMethod('topNwords', c('JST.result','numeric','missing','missing'),
-          function(x,N,topic,sentiment) {
+setMethod('topNwords', c('JST.result','numeric'),
+          function(x,N) {
             res <- as.data.frame(matrix(ncol = 0, nrow = N))
             
             for (topic in c(1:x@numTopics)) {
@@ -175,8 +175,8 @@ setMethod('top20words', c('JST.result','numeric','numeric'),
 
 #' @rdname top20words-method
 #' @aliases top20words,JST.result-method
-setMethod('top20words', c('JST.result','missing','missing'),
-          function(x,topic,sentiment) {
+setMethod('top20words', c('JST.result'),
+          function(x) {
             return(topNwords(x,20))
           })
 

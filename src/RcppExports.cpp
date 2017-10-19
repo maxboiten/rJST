@@ -44,10 +44,26 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// gibbsldacpp
+Rcpp::List gibbsldacpp(arma::sp_imat& dfm, int numTopics, int numiters, double alpha_, double beta_);
+RcppExport SEXP _rJST_gibbsldacpp(SEXP dfmSEXP, SEXP numTopicsSEXP, SEXP numitersSEXP, SEXP alpha_SEXP, SEXP beta_SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::sp_imat& >::type dfm(dfmSEXP);
+    Rcpp::traits::input_parameter< int >::type numTopics(numTopicsSEXP);
+    Rcpp::traits::input_parameter< int >::type numiters(numitersSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha_(alpha_SEXP);
+    Rcpp::traits::input_parameter< double >::type beta_(beta_SEXP);
+    rcpp_result_gen = Rcpp::wrap(gibbsldacpp(dfm, numTopics, numiters, alpha_, beta_));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rJST_jstcpp", (DL_FUNC) &_rJST_jstcpp, 9},
     {"_rJST_jstcppreversed", (DL_FUNC) &_rJST_jstcppreversed, 9},
+    {"_rJST_gibbsldacpp", (DL_FUNC) &_rJST_gibbsldacpp, 5},
     {NULL, NULL, 0}
 };
 
