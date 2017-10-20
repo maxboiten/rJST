@@ -116,6 +116,7 @@ void gibbslda::estimate() {
     if (iter % 100 == 0) {
       Rcpp::Rcout << "Iteration " << iter << "!\n";
     }
+    
     std::fill(locations.begin(),locations.end(),0); //reset the locations
 
     for (arma::sp_imat::iterator it = dfm->begin(); it != dfm->end(); it++) {

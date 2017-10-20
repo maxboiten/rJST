@@ -142,7 +142,8 @@ setMethod('topNwords', c('JST.result','numeric','numeric','numeric'),
             
             res <- rownames(x@phi)[topNwordSeeds(column,N)]
 
-            res <- as.data.frame(res)
+            res <- as.data.frame(res,stringsAsFactors = FALSE)
+
             names(res) <- colname
             
             return(res)

@@ -75,9 +75,10 @@ setMethod('topNwords', c('LDA.result','numeric','numeric'),
             
             column <- sapply(x@phi[colname],as.numeric)
             
-            res <- rownames(column)[topNwordSeeds(column,N)]
+            res <- rownames(x@phi)[topNwordSeeds(column,N)]
 
-            res <- as.data.frame(res)
+            res <- as.data.frame(res,stringsAsFactors = FALSE)
+
             names(res) <- colname
             
             return(res)
