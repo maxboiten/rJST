@@ -21,7 +21,7 @@ Used in: topNwords
 
 // [[Rcpp::export]]
 Rcpp::NumericVector topNwordSeeds(Rcpp::NumericVector& wordParameters, int N) {
-    Rcpp::NumericVector result;
+    Rcpp::NumericVector result(N);
     std::vector<std::pair<double,int> > parameterVector;
     parameterVector.resize(wordParameters.size());
 
