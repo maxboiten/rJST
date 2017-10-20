@@ -58,8 +58,7 @@ lda <- function(dfm,numTopics,numIters,alpha,beta) {
   phi <- as.data.frame(res$phi)
   
   names(phi) <- topic.names
-  
-  phi <- cbind(word,phi)
+  rownames(phi) <- word
   
   return(new('LDA.result',theta = theta,
              phi = phi,
@@ -68,20 +67,16 @@ lda <- function(dfm,numTopics,numIters,alpha,beta) {
              docvars = docvars))
 }
 
-
-
 #' @rdname topNwords-method
 #' @aliases topNwords,LDA.result,numeric,numeric-method
 setMethod('topNwords', c('LDA.result','numeric','numeric'),
           function(x,N,topic) {
             colname <- paste('topic',topic,sep='')
             
-            res <- x@phi
+            column <- sapply(x@phi[colname],as.numeric)
             
-            res <- res[order(res[colname],decreasing= TRUE),]
-            
-            res <- res[1:N,1]
-            res <- as.character(res)
+            res <- rownames(column)[topNwordSeeds(column,N)]
+
             res <- as.data.frame(res)
             names(res) <- colname
             

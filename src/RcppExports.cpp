@@ -59,11 +59,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// topNwordSeeds
+Rcpp::NumericVector topNwordSeeds(Rcpp::NumericVector& wordParameters, int N);
+RcppExport SEXP _rJST_topNwordSeeds(SEXP wordParametersSEXP, SEXP NSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector& >::type wordParameters(wordParametersSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    rcpp_result_gen = Rcpp::wrap(topNwordSeeds(wordParameters, N));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rJST_jstcpp", (DL_FUNC) &_rJST_jstcpp, 9},
     {"_rJST_jstcppreversed", (DL_FUNC) &_rJST_jstcppreversed, 9},
     {"_rJST_gibbsldacpp", (DL_FUNC) &_rJST_gibbsldacpp, 5},
+    {"_rJST_topNwordSeeds", (DL_FUNC) &_rJST_topNwordSeeds, 2},
     {NULL, NULL, 0}
 };
 

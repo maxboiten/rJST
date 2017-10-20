@@ -144,13 +144,10 @@ setMethod('topNwords', c('JST_reversed.result','numeric','numeric','numeric'),
           function(x,N,topic,sentiment) {
             colname <- paste('topic',topic,'sent',sentiment,sep='')
             
-            res <- cbind(rownames(x@phi),x@phi[colname])
-            names(res) <- c('word',colname)
+            column <- sapply(x@phi[colname],as.numeric)
             
-            res <- res[order(res[colname],decreasing= TRUE),]
-            
-            res <- res[1:N,1]
-            res <- as.character(res)
+            res <- rownames(x@phi)[topNwordSeeds(column,N)]
+
             res <- as.data.frame(res)
             names(res) <- colname
             
