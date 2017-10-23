@@ -33,6 +33,8 @@ Rcpp::NumericVector topNwordSeeds(Rcpp::NumericVector& wordParameters, int N) {
     }
 
     std::sort(parameterVector.begin(),parameterVector.end()); //Note: Sorting is ascending by default
+    //Note on sorting pairs. By default they are sorted by the first element and if that is equal by the second.
+    //Therefore, the first element of the pair has to be the parameter value and te second the vector position.
     std::reverse(parameterVector.begin(),parameterVector.end()); //So we reverse the vector here.
 
     for (int i = 0; i < N; i++) {
