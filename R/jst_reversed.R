@@ -144,14 +144,12 @@ setMethod('topNwords', c('JST_reversed.result','numeric','numeric','numeric'),
           function(x,N,topic,sentiment) {
             colname <- paste('topic',topic,'sent',sentiment,sep='')
             
-            res <- cbind(rownames(x@phi),x@phi[colname])
-            names(res) <- c('word',colname)
+            column <- sapply(x@phi[colname],as.numeric)
             
-            res <- res[order(res[colname],decreasing= TRUE),]
-            
-            res <- res[1:N,1]
-            res <- as.character(res)
-            res <- as.data.frame(res)
+            res <- rownames(x@phi)[topNwordSeeds(column,N)]
+
+            res <- as.data.frame(res,stringsAsFactors = FALSE)
+
             names(res) <- colname
             
             return(res)
@@ -159,8 +157,8 @@ setMethod('topNwords', c('JST_reversed.result','numeric','numeric','numeric'),
 
 #' @rdname topNwords-method
 #' @aliases topNwords,JST_reversed.result,numeric,-method
-setMethod('topNwords', c('JST_reversed.result','numeric','missing','missing'),
-          function(x,N,topic,sentiment) {
+setMethod('topNwords', c('JST_reversed.result','numeric'),
+          function(x,N) {
             res <- as.data.frame(matrix(ncol = 0, nrow = N))
             
             for (topic in c(1:x@numTopics)) {
@@ -181,8 +179,8 @@ setMethod('top20words', c('JST_reversed.result','numeric','numeric'),
 
 #' @rdname top20words-method
 #' @aliases top20words,JST_reversed.result-method
-setMethod('top20words', c('JST_reversed.result','missing','missing'),
-          function(x,topic,sentiment) {
+setMethod('top20words', c('JST_reversed.result'),
+          function(x) {
             return(topNwords(x,20))
           })
 
