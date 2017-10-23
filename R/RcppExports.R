@@ -9,3 +9,11 @@ jstcppreversed <- function(dfm, sentiLexList, numSentiLabs, numTopics, numiters,
     .Call('_rJST_jstcppreversed', PACKAGE = 'rJST', dfm, sentiLexList, numSentiLabs, numTopics, numiters, updateParaStep, alpha_, beta_, gamma_)
 }
 
+gibbsldacpp <- function(dfm, numTopics, numiters, alpha_, beta_) {
+    .Call('_rJST_gibbsldacpp', PACKAGE = 'rJST', dfm, numTopics, numiters, alpha_, beta_)
+}
+
+topNwordSeeds <- function(wordParameters, N) {
+    .Call('_rJST_topNwordSeeds', PACKAGE = 'rJST', wordParameters, N)
+}
+

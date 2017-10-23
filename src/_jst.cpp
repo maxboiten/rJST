@@ -179,6 +179,9 @@ void modeljst::estimate() {
   std::vector<int> locations(numDocs);
 
   for (int iter = 1; iter <= numiters; iter++) {
+    if (iter % 100 == 0) {
+      Rcpp::Rcout << "Iteration " << iter << "!\n";
+    }
 
     std::fill(locations.begin(),locations.end(),0); //reset the locations
 

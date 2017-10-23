@@ -26,4 +26,5 @@ Collate:
     'topNwords.R'
     'jst.R'
     'jst_reversed.R'
+    'lda.R'
     'rJST.R'
