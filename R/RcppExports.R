@@ -13,6 +13,10 @@ gibbsldacpp <- function(dfm, numTopics, numiters, alpha_, beta_) {
     .Call('_rJST_gibbsldacpp', PACKAGE = 'rJST', dfm, numTopics, numiters, alpha_, beta_)
 }
 
+sldacpp <- function(sfm, documentVector, sentenceVector, numTopics, numiters, alpha_, beta_) {
+    .Call('_rJST_sldacpp', PACKAGE = 'rJST', sfm, documentVector, sentenceVector, numTopics, numiters, alpha_, beta_)
+}
+
 topNwordSeeds <- function(wordParameters, N) {
     .Call('_rJST_topNwordSeeds', PACKAGE = 'rJST', wordParameters, N)
 }

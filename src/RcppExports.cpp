@@ -2,6 +2,7 @@
 // Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #include <RcppArmadillo.h>
+#include <RcppEigen.h>
 #include <Rcpp.h>
 
 using namespace Rcpp;
@@ -59,6 +60,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// sldacpp
+Rcpp::List sldacpp(Eigen::SparseMatrix<int,Eigen::ColMajor>& sfm, Rcpp::NumericVector& documentVector, Rcpp::NumericVector& sentenceVector, int numTopics, int numiters, double alpha_, double beta_);
+RcppExport SEXP _rJST_sldacpp(SEXP sfmSEXP, SEXP documentVectorSEXP, SEXP sentenceVectorSEXP, SEXP numTopicsSEXP, SEXP numitersSEXP, SEXP alpha_SEXP, SEXP beta_SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<int,Eigen::ColMajor>& >::type sfm(sfmSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector& >::type documentVector(documentVectorSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector& >::type sentenceVector(sentenceVectorSEXP);
+    Rcpp::traits::input_parameter< int >::type numTopics(numTopicsSEXP);
+    Rcpp::traits::input_parameter< int >::type numiters(numitersSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha_(alpha_SEXP);
+    Rcpp::traits::input_parameter< double >::type beta_(beta_SEXP);
+    rcpp_result_gen = Rcpp::wrap(sldacpp(sfm, documentVector, sentenceVector, numTopics, numiters, alpha_, beta_));
+    return rcpp_result_gen;
+END_RCPP
+}
 // topNwordSeeds
 Rcpp::NumericVector topNwordSeeds(Rcpp::NumericVector& wordParameters, int N);
 RcppExport SEXP _rJST_topNwordSeeds(SEXP wordParametersSEXP, SEXP NSEXP) {
@@ -76,6 +94,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rJST_jstcpp", (DL_FUNC) &_rJST_jstcpp, 9},
     {"_rJST_jstcppreversed", (DL_FUNC) &_rJST_jstcppreversed, 9},
     {"_rJST_gibbsldacpp", (DL_FUNC) &_rJST_gibbsldacpp, 5},
+    {"_rJST_sldacpp", (DL_FUNC) &_rJST_sldacpp, 7},
     {"_rJST_topNwordSeeds", (DL_FUNC) &_rJST_topNwordSeeds, 2},
     {NULL, NULL, 0}
 };

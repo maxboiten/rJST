@@ -15,16 +15,19 @@ Imports: Rcpp (>= 0.12.12),
     SnowballC,
     quanteda,
     broom,
-    reshape2
+    reshape2,
+    stringi
 Depends: broom,
     quanteda
-LinkingTo: Rcpp, RcppArmadillo
+LinkingTo: Rcpp, RcppArmadillo, RcppEigen
 RoxygenNote: 6.0.1
 Collate: 
     'RcppExports.R'
+    'corpus_sentences.R'
     'dictionary.R'
     'topNwords.R'
     'jst.R'
     'jst_reversed.R'
     'lda.R'
     'rJST.R'
+    'sentenceLDA.R'
