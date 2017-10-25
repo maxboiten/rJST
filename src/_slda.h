@@ -2,6 +2,8 @@
 #define __SLDA_H
 
 #include "RcppEigen.h"
+#include <progress.hpp>
+#include <progress_bar.hpp>
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
@@ -10,7 +12,7 @@
 #include <utility>
 #include <numeric>
 
-// [[Rcpp::depends(RcppEigen)]]
+// [[Rcpp::depends(RcppEigen,RcppProgress)]]
 
 typedef std::pair<int,int> docSentencePair;
 typedef Eigen::SparseMatrix<int,Eigen::RowMajor> SpMat;

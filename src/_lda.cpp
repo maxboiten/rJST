@@ -112,10 +112,9 @@ void gibbslda::estimate() {
   int document, wordToken, topic;
   std::vector<int> locations(numDocs);
 
+  Progress p(numiters,true);
+
   for (int iter = 1; iter <= numiters; iter++) {
-    if (iter % 100 == 0) {
-      Rcpp::Rcout << "Iteration " << iter << "!\n";
-    }
     
     std::fill(locations.begin(),locations.end(),0); //reset the locations
 
@@ -145,6 +144,7 @@ void gibbslda::estimate() {
         locations[document]++;
       }
     }
+    p.increment();
   }
 
   computeThetatd();

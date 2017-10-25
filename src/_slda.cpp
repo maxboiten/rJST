@@ -8,6 +8,7 @@ Notes.
   non-zero elements. This way we can iterate over rows efficiently, saving running the initialisation
   in under a second rather than over the course of several minutes (on a small test document set) 
   with occasional crashes.
+2 - TODO: term scores?
 */
 
 // [[Rcpp::export]]
@@ -133,6 +134,8 @@ void sldamodel::init_estimate() {
 void sldamodel::estimate() {
   int newTopic,oldTopic,document,sentence;
 
+  Progress p(numiters-1,true);
+
   for (int iter = 1; iter < numiters; iter++) {
     for (int row = 0; row < numSentences; row++) {
       document = documentSentenceVec[row].first;
@@ -140,19 +143,21 @@ void sldamodel::estimate() {
       oldTopic = topic_ds[document][sentence];
 
       ntd_s[oldTopic][document]--;
-      nt_w[oldTopic] -= sentenceSizes[sentence];
+      nt_w[oldTopic] -= sentenceSizes[row];
       for (rowit it(*sfm,row); it; ++it) {
         ntw_w[oldTopic][it.col()] -= it.value();
       }
 
       newTopic = drawsample(row, document);
+      topic_ds[document][sentence] = newTopic;
 
       ntd_s[newTopic][document]++;
-      nt_w[newTopic] += sentenceSizes[sentence];
+      nt_w[newTopic] += sentenceSizes[row];
       for (rowit it(*sfm,row); it; ++it) {
         ntw_w[newTopic][it.col()] += it.value();
       }
     }
+    p.increment();
   }
 
   computePhitw();
@@ -181,7 +186,7 @@ int sldamodel::drawsample(int row, int document) {
 
   //Multiply the second term of the posterior by the first term
   for (int topic = 0; topic < numTopics; topic++) {
-    pt[topic] *= (ntd_s[topic][document]+alpha)/(sentenceSizes[document] + alphaSum[document]);
+    pt[topic] *= (ntd_s[topic][document]+alpha)/(docSizes[document] + alphaSum[document]);
   }
 
   //Sum posteriors cumulatiely for sampling.
@@ -204,7 +209,7 @@ int sldamodel::drawsample(int row, int document) {
 void sldamodel::computeThetatd() {
   for (int t = 0; t < numTopics; t++) {
     for (int d = 0; d < numDocs; d++) {
-      thetatd[t][d] = (ntd_s[t][d] + alpha) / (sentenceSizes[d] + alphaSum[d]);
+      thetatd[t][d] = (ntd_s[t][d] + alpha) / (docSizes[d] + alphaSum[d]);
     }
   }
 }

@@ -19,7 +19,7 @@ Imports: Rcpp (>= 0.12.12),
     stringi
 Depends: broom,
     quanteda
-LinkingTo: Rcpp, RcppArmadillo, RcppEigen
+LinkingTo: Rcpp, RcppArmadillo, RcppEigen, RcppProgress
 RoxygenNote: 6.0.1
 Collate: 
     'RcppExports.R'

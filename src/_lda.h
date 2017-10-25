@@ -3,6 +3,8 @@
 
 #include <RcppArmadillo.h>
 #include <stdlib.h>
+#include <progress.hpp>
+#include <progress_bar.hpp>
 #include <time.h>
 #include <math.h>
 #include <vector>
@@ -10,7 +12,7 @@
 #include <utility>
 #include <numeric>
 
-// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::depends(RcppArmadillo,RcppProgress)]]
 
 class gibbslda {
 
