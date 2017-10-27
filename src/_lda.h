@@ -55,7 +55,7 @@ public:
 
   void init();
   void init_estimate();
-  void estimate();
+  int estimate();
 
 private:
   void init_parameters();

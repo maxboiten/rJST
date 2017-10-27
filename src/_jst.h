@@ -2,6 +2,8 @@
 #define __JST_H
 
 #include <RcppArmadillo.h>
+#include <progress.hpp>
+#include <progress_bar.hpp>
 #include "polya_fit_simple.h"
 #include <stdlib.h>
 #include <time.h>
@@ -33,7 +35,7 @@ public:
 
   arma::sp_imat * dfm;
   std::vector<int> docSizes;
-  std::map<int,std::vector<double> > sentiLex;
+  std::map<int,int> sentiLex;
 
   std::vector<std::vector<int> > topic_dw;
   std::vector<std::vector<int> > sent_dw;
@@ -58,26 +60,26 @@ public:
 
   //Result vectors
   std::vector<std::vector<double> > pi_dl; // size: (numDocs x L)
-	std::vector<std::vector<std::vector<double> > > theta_dlz; // size: (numDocs x L x T)
+	std::vector<std::vector<std::vector<double> > > theta_lzd; // size: (numDocs x L x T)
 	std::vector<std::vector<std::vector<double> > > phi_lzw; // size: (L x T x V)
 
-  void init(Rcpp::List& sentiLexList);
+  void init(Rcpp::IntegerVector& sentiWords, Rcpp::IntegerVector& sentiCategory);
   void init_estimate();
-  void estimate();
+  int estimate();
 
   std::vector<std::vector<double> > returnPi() { return pi_dl;};
-  std::vector<std::vector<std::vector<double> > > returnTheta() { return theta_dlz;};
+  std::vector<std::vector<std::vector<double> > > returnTheta() { return theta_lzd;};
   std::vector<std::vector<std::vector<double> > > returnPhi() { return phi_lzw;};
   std::vector<std::vector<std::vector<double> > > termScores();
 
 private:
   void init_parameters();
-  void drawsample(int document, int wordToken, int&topic, int&sentilab);
+  void drawsample(int document, int wordToken, int& topic, int& sentilab);
   void set_alpha();
   void set_beta();
   void set_gamma();
   void compute_pi_dl();
-  void compute_theta_dlz();
+  void compute_theta_lzd();
   void compute_phi_lzw();
   void update_Parameters();
 

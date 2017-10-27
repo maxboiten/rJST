@@ -60,7 +60,7 @@ public:
   std::vector<std::vector<double> > phitw;
 
   void init(Rcpp::NumericVector& documentVector, Rcpp::NumericVector& sentenceVector);
-  void estimate();
+  int estimate();
 
 private:
   void init_estimate();

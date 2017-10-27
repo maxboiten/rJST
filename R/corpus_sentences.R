@@ -25,6 +25,7 @@ corpus_sentences <- function(corpus) {
   if (!is.corpus(corpus)) {
     stop('The input variable has to be a quanteda corpus object.')
   }
+  docIDs <- rownames(corpus$documents)
   documents <- as.list(corpus$documents)
   newDocuments <- list()
   
@@ -60,15 +61,15 @@ corpus_sentences <- function(corpus) {
         newDocuments[[name]] <- c(newDocuments[[name]],rep(documents[[name]][i],numSentences))
       }
     }
+    newDocuments$docId <- c(newDocuments$docId,rep(docIDs[i],numSentences))
     newDocuments$sentenceNo <- c(newDocuments$sentenceNo,c(1:numSentences))
   }
   
   newDocuments <- as.data.frame(newDocuments)
   
   #Create an id variable with unique values
-  newDocuments$docId <- newDocuments$id
-  newDocuments$id <- paste(newDocuments$id,newDocuments$sentenceNo,sep='-')
-  rownames(newDocuments) <- newDocuments$id
+  newRownames <- paste(newDocuments$docId,newDocuments$sentenceNo,sep='-')
+  rownames(newDocuments) <- newRownames
   
   #Insert new documents back into the old corpus object
   corpus$documents <- newDocuments

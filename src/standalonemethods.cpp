@@ -1,7 +1,7 @@
-// This file contains utility functions for the package that would otherwise be slow in R,
-// but are not a model or anything by themselves.
+// This file contains standalone methods for the package that would otherwise be slow in R,
+// but do not require a model by themselves.
 
-#include "utils.h"
+#include "standalonemethods.h"
 
 /*
 method topNwordSeeds

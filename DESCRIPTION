@@ -23,9 +23,10 @@ LinkingTo: Rcpp, RcppArmadillo, RcppEigen, RcppProgress
 RoxygenNote: 6.0.1
 Collate: 
     'RcppExports.R'
+    'topNwords.R'
+    'asum.R'
     'corpus_sentences.R'
     'dictionary.R'
-    'topNwords.R'
     'jst.R'
     'jst_reversed.R'
     'lda.R'

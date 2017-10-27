@@ -1,10 +1,11 @@
 #include "_jstreversed.h"
 
-// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::depends(RcppArmadillo,RcppProgress)]]
 
 // [[Rcpp::export]]
 Rcpp::List jstcppreversed(arma::sp_imat& dfm,
-        Rcpp::List& sentiLexList,
+        Rcpp::IntegerVector& sentiWords,
+        Rcpp::IntegerVector& sentiCategory,
         int numSentiLabs,
         int numTopics,
         int numiters,
@@ -24,8 +25,10 @@ Rcpp::List jstcppreversed(arma::sp_imat& dfm,
     jst->updateParaStep = updateParaStep;
     jst->dfm = &dfm;
 
-    jst->init(sentiLexList);
-    jst->estimate();
+    jst->init(sentiWords,sentiCategory);
+    if (jst->estimate()) {
+      return Rcpp::List();
+    }
 
     return Rcpp::List::create(Rcpp::Named("pi") = jst->returnPi(),
                              Rcpp::Named("theta") = jst->returnTheta(),
@@ -33,10 +36,7 @@ Rcpp::List jstcppreversed(arma::sp_imat& dfm,
                              Rcpp::Named("phi.termScores") = jst->termScores());
 }
 
-void modeljstrev::init(Rcpp::List& sentiLexList) {
-  std::vector<double> sentiLexEntry, priorProb;
-  int wordToken;
-
+void modeljstrev::init(Rcpp::IntegerVector& sentiWords, Rcpp::IntegerVector& sentiCategory) {
   numDocs = dfm->n_rows;
   vocabSize = dfm->n_cols;
 
@@ -46,12 +46,8 @@ void modeljstrev::init(Rcpp::List& sentiLexList) {
   }
   aveDocSize = (double)std::accumulate(docSizes.begin(),docSizes.end(),0)/(double)numDocs;
 
-  for (Rcpp::List::iterator it = sentiLexList.begin(); it < sentiLexList.end(); it++) {
-    sentiLexEntry = Rcpp::as<std::vector<double> >(*it);
-    wordToken = (int) sentiLexEntry[0];
-    std::copy(sentiLexEntry.begin()+1,sentiLexEntry.end(),priorProb.begin());
-    sentiLex.insert(std::pair<int, std::vector<double> >(wordToken, priorProb));
-    priorProb.clear();
+  for (std::size_t i = 0; i < (std::size_t) sentiWords.size(); i++) {
+    sentiLex.insert(std::pair<int,int>(sentiWords[i], sentiCategory[i]));
   }
 
   init_parameters();
@@ -137,7 +133,7 @@ void modeljstrev::init_estimate() {
   srand(time(NULL));
 
   int document, wordToken, priorSent, topic, sentilab;
-  std::map<int,std::vector<double> >::iterator sentiIt;
+  std::map<int,int>::iterator sentiIt;
 
   std::vector<int> locations(numDocs);
   std::fill(locations.begin(),locations.end(),0);
@@ -150,15 +146,17 @@ void modeljstrev::init_estimate() {
     sentiIt = sentiLex.find(wordToken);
 
     if (sentiIt != sentiLex.end()) { //Word token is found in the Sentiment Lexicon!
-      sentilab = std::distance(sentiIt->second.begin(),
-                                std::max_element(sentiIt->second.begin(),sentiIt->second.end()));
+      priorSent = sentiIt->second;
     }
 
     for (int i = 0; i < (int)(*it); i++) {
 
       if (priorSent == -1) {
         sentilab = rand() % numSentiLabs;
+      } else {
+        sentilab = priorSent;
       }
+
       topic = rand() % numTopics;
 
       topic_dw[document][locations[document]] = topic;
@@ -175,13 +173,16 @@ void modeljstrev::init_estimate() {
   }
 }
 
-void modeljstrev::estimate() {
+int modeljstrev::estimate() {
   int document, wordToken, topic, sentilab;
   std::vector<int> locations(numDocs);
 
+  Progress p(numiters,true);
+
   for (int iter = 1; iter <= numiters; iter++) {
-    if (iter % 100 == 0) {
-      Rcpp::Rcout << "Iteration " << iter << "!\n";
+    if (Progress::check_abort()) {
+      Rcpp::Rcout << "Process aborted at iteration " << iter << std::endl;
+      return 1;
     }
 
     std::fill(locations.begin(),locations.end(),0); //reset the locations
@@ -221,13 +222,16 @@ void modeljstrev::estimate() {
 
     if (updateParaStep > 0 && iter % updateParaStep == 0) {
 			this->update_Parameters();
-		}
+    }
+    p.increment();
   }
 
   //Compute parameter values
   compute_pi_zdl();
   compute_theta_zd();
   compute_phi_zlw();
+
+  return 0;
 }
 
 void modeljstrev::drawsample(int d, int w, int& topic, int& sentilab) {
@@ -313,7 +317,7 @@ void modeljstrev::set_alpha() {
 }
 
 void modeljstrev::set_beta() {
-  std::map<int,std::vector<double> >::iterator sentiIt;
+  int wordToken;
   std::vector<std::vector<double> > lambda_lw;
 
   if (beta_ <= 0) {
@@ -343,10 +347,15 @@ void modeljstrev::set_beta() {
 		}
 	}
 
-  for (sentiIt = sentiLex.begin(); sentiIt != sentiLex.end(); sentiIt++) {
+  for (std::map<int,int>::iterator it = sentiLex.begin(); it != sentiLex.end(); it++) {
+    wordToken = it->first;
     //For each entry of the sentiment lexicon:
-		for (int j = 0; j < numSentiLabs; j++) {
-			lambda_lw[j][sentiIt->first] = sentiIt->second[j];
+		for (int l = 0; l < numSentiLabs; l++) {
+      if (it->second == l) {
+        lambda_lw[l][wordToken] = 0.9;
+      } else {
+        lambda_lw[l][wordToken] = 0.1/((double)numSentiLabs-1.0);
+      }
 		}
 	}
 

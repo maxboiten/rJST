@@ -31,7 +31,9 @@ Rcpp::List sldacpp(Eigen::SparseMatrix<int,Eigen::ColMajor>& sfm,
     slda->sfm = &sfmChanged;
 
     slda->init(documentVector,sentenceVector);
-    slda->estimate();
+    if (slda->estimate()) {
+      return Rcpp::List();
+    }
 
     return Rcpp::List::create(Rcpp::Named("phi") = slda->phitw,
                              Rcpp::Named("theta") = slda->thetatd);
@@ -131,12 +133,16 @@ void sldamodel::init_estimate() {
   }
 }
 
-void sldamodel::estimate() {
+int sldamodel::estimate() {
   int newTopic,oldTopic,document,sentence;
 
   Progress p(numiters-1,true);
 
   for (int iter = 1; iter < numiters; iter++) {
+    if (Progress::check_abort()) {
+      Rcpp::Rcout << "Process aborted at iteration " << iter << std::endl;
+      return 1;
+    }
     for (int row = 0; row < numSentences; row++) {
       document = documentSentenceVec[row].first;
       sentence = documentSentenceVec[row].second;
@@ -162,6 +168,8 @@ void sldamodel::estimate() {
 
   computePhitw();
   computeThetatd();
+
+  return 0;
 }
 
 int sldamodel::drawsample(int row, int document) {
