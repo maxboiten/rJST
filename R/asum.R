@@ -61,6 +61,7 @@ is.ASUM.result <- function(x) {
 #'@param excludeNeutral Boolean. This variable instructs whether an extra category for neutral
 #' sentences should be added to the categories provided by the sentiment dictionary.
 #'@return An ASUM.result object containing the parameters from the estimated model.
+#'@export
 asum <- function(sfm, 
                  sentimentLexicon = NULL, 
                  numIters = 3, 
