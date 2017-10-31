@@ -6,13 +6,15 @@
 \usage{
 jst_reversed(dfm, sentiLexInput = list(), numSentiLabs = 3,
   numTopics = 10, numIters = 3, updateParaStep = -1, alpha = -1,
-  beta = -1, gamma = -1)
+  beta = -1, gamma = -1, excludeNeutral = FALSE)
 }
 \arguments{
 \item{dfm}{A quanteda dfm object}
 
-\item{sentiLexInput}{Optional: A quanteda dictionary object for semi-supervised 
-learning}
+\item{sentiLexInput}{Optional: A quanteda dictionary object for semi-supervised learning. If
+a dictionary is used, \code{numSentiLabs} will be overridden by the number of categories in the
+dictionary object. An extra category will by default be added for neutral words. This can be
+turned off by setting \code{excludeNeutral = TRUE}.}
 
 \item{numSentiLabs}{Integer, the number of sentiment labels (defaults to 3)}
 
@@ -28,6 +30,11 @@ of hyperparameter alpha}
 \item{beta}{Double, hyperparameter for (defaults to)}
 
 \item{gamma}{Double, hyperparameter for (defaults to)}
+
+\item{excludeNeutral}{Boolean. If a dictionary is used, an extra category is added for neutral
+words. Words in the dictionary receive a low probability of being allocated there. If this is set
+to \code{TRUE}, the neutral sentiment category will be omitted. The variable is irrelevant if no
+dictionary is used. Defaults to \code{FALSE}.}
 }
 \value{
 A JST_reversed.result object containing a data.frame for each estimated 

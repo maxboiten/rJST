@@ -1,5 +1,5 @@
-#ifndef _UTILS_H
-#define _UTILS_H
+#ifndef _STANDALONEMETHODS_H
+#define _STANDALONEMETHODS_H
 
 #include <Rcpp.h>
 #include <vector>

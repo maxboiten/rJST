@@ -2,6 +2,8 @@
 #define __JSTREVERSED_H
 
 #include <RcppArmadillo.h>
+#include <progress.hpp>
+#include <progress_bar.hpp>
 #include "polya_fit_simple.h"
 #include <stdlib.h>
 #include <time.h>
@@ -34,7 +36,7 @@ public:
 
   arma::sp_imat * dfm;
   std::vector<int> docSizes;
-  std::map<int,std::vector<double> > sentiLex;
+  std::map<int,int> sentiLex;
 
   std::vector<std::vector<int> > topic_dw;
   std::vector<std::vector<int> > sent_dw;
@@ -62,9 +64,9 @@ public:
 	std::vector<std::vector<double> > theta_zd; // size: (numDocs x L x T)
 	std::vector<std::vector<std::vector<double> > > phi_zlw; // size: (L x T x V)
 
-  void init(Rcpp::List& sentiLexList);
+  void init(Rcpp::IntegerVector& sentiWords, Rcpp::IntegerVector& sentiCategory);
   void init_estimate();
-  void estimate();
+  int estimate();
 
   std::vector<std::vector<std::vector<double> > >  returnPi() { return pi_zdl;};
   std::vector<std::vector<double> > returnTheta() { return theta_zd;};

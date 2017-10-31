@@ -19,8 +19,10 @@ is.JST_reversed.result <- function(x) {
 #' it is still work in progress.
 #'
 #' @param dfm A quanteda dfm object
-#' @param sentiLexInput Optional: A quanteda dictionary object for semi-supervised 
-#' learning
+#' @param sentiLexInput Optional: A quanteda dictionary object for semi-supervised learning. If
+#' a dictionary is used, \code{numSentiLabs} will be overridden by the number of categories in the
+#' dictionary object. An extra category will by default be added for neutral words. This can be
+#' turned off by setting \code{excludeNeutral = TRUE}.
 #' @param numSentiLabs Integer, the number of sentiment labels (defaults to 3)
 #' @param numTopics Integer, the number of topics (defaults to 10)
 #' @param numIters Integer, the number of iterations (defaults to ???)
@@ -29,6 +31,10 @@ is.JST_reversed.result <- function(x) {
 #' @param alpha Double, hyperparameter for (defaults to)
 #' @param beta Double, hyperparameter for (defaults to)
 #' @param gamma Double, hyperparameter for (defaults to)
+#' @param excludeNeutral Boolean. If a dictionary is used, an extra category is added for neutral
+#' words. Words in the dictionary receive a low probability of being allocated there. If this is set
+#' to \code{TRUE}, the neutral sentiment category will be omitted. The variable is irrelevant if no
+#' dictionary is used. Defaults to \code{FALSE}.
 #' @return A JST_reversed.result object containing a data.frame for each estimated 
 #' parameter
 #' @export
@@ -39,42 +45,39 @@ jst_reversed <- function(dfm,sentiLexInput=list(),
                 updateParaStep = -1,
                 alpha = -1,
                 beta = -1,
-                gamma = -1) {
+                gamma = -1,
+                excludeNeutral = FALSE) {
   
   if (!any(class(dfm) == 'dfmSparse')) {
     stop('Please input a sparse quanteda dfm object as data.')
   }
   
+  sentiWords <- integer()
+  sentimentCategory <- integer()
+  
   if(is.dictionary(sentiLexInput)) {
-    sentiLex <- list()
     numSentiLabs_Lex <- length(sentiLexInput)
-    
-    if (numSentiLabs_Lex > numSentiLabs) {
-      stop('The number of sentiment labels in the lexicon is higher than the parameter for the number of sentiment labels')
-    }
+    numSentiLabs <- numSentiLabs_Lex + 1 - excludeNeutral
     
     size <- 1
     for (i in c(1:numSentiLabs_Lex)) {
       for (word in sentiLexInput[[i]]) {
-        if(word %in% attributes(tokens)$types) {
-          #Note below the addition of an extra colum for the neutral probability.
-          #Calculation done according to Lin, Ibeke, Wyner and Guerin, 2015. (lambda = {.9 if w in lexicon, .05 if w not in lexicon})
-          #Adjusted for more than two sentiments by replacing .05 by .1/numSentiLabs_Lex
-          sentiLex[[size]] <- c(match(word,attributes(tokens)$types),
-                                rep(0.1/numSentiLabs_Lex,i),
-                                0.9,
-                                rep(0.1/numSentiLabs_Lex,numSentiLabs_Lex-i))
+        if(word %in% featnames(dfm)) {
+          sentiWords[size] <- as.integer(match(word,featnames(dfm))-1) #-1 for C++ index
+          sentimentCategory[size] <- as.integer(i-excludeNeutral)
           size <- size + 1
         }
       }
     }
-    
-  }
-  else {
-    sentiLex = list()
+  } else {
+    stop('The input lexicon needs to be a quanteda dictionary object.')
   }
   
-  res <- jstcppreversed(dfm,sentiLex,numSentiLabs, numTopics, numIters, updateParaStep, alpha,beta,gamma)
+  res <- jstcppreversed(dfm,sentiWords,sentimentCategory,numSentiLabs, numTopics, numIters, updateParaStep, alpha,beta,gamma)
+  
+  if(length(res)==0) {
+    return(0)
+  }
   
   #prepare doc topic distribution data.frame
   docIDs <- attr(dfm,'Dimnames')$docs

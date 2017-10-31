@@ -16,7 +16,9 @@ Rcpp::List gibbsldacpp(arma::sp_imat& dfm,
     lda->dfm = &dfm;
 
     lda->init();
-    lda->estimate();
+    if (lda->estimate()) {
+      return Rcpp::List();
+    }
 
     return Rcpp::List::create(Rcpp::Named("phi") = lda->phitw,
                              Rcpp::Named("theta") = lda->thetatd);
@@ -108,13 +110,16 @@ void gibbslda::init_estimate() {
   }
 }
 
-void gibbslda::estimate() {
+int gibbslda::estimate() {
   int document, wordToken, topic;
   std::vector<int> locations(numDocs);
 
+  Progress p(numiters,true);
+
   for (int iter = 1; iter <= numiters; iter++) {
-    if (iter % 100 == 0) {
-      Rcpp::Rcout << "Iteration " << iter << "!\n";
+    if (Progress::check_abort()) {
+      Rcpp::Rcout << "Process aborted at iteration " << iter << std::endl;
+      return 1;
     }
     
     std::fill(locations.begin(),locations.end(),0); //reset the locations
@@ -145,10 +150,13 @@ void gibbslda::estimate() {
         locations[document]++;
       }
     }
+    p.increment();
   }
 
   computeThetatd();
   computePhitw();
+
+  return 0;
 }
 
 void gibbslda::drawsample(int d, int w, int&topic) {
