@@ -9,7 +9,7 @@
 #' @param corpus A quanteda corpus object
 #' 
 #' @return A quanteda corpus object with sentences split. This has the following changes:
-#'         \itemize {
+#'         \itemize{
 #'          \item{sentenceNo}{The number of the sentences within documents. The are kept in
 #'          order of appearance.}
 #'          \item{docId}{The old id variable (document id) is replicated for every sentence and
