@@ -111,5 +111,148 @@ asum <- function(sfm,
                  gamma,
                  betaVec)
   
+  #General variables
+  docvars <- sfm@docvars[sfm@docvars$sentenceNo==1,]
+  docvars$sentenceNo <- NULL
+  
+  docID <- docvars$docId
+  word <- sfm@Dimnames$features
+  
+  #pi data.frame
+  pi <- as.data.frame(res$pi)
+  
+  for (i in c(1:numSentiLabs)) {
+     names(pi)[i] <- paste0('sent',i)
+  }
+  
+  rownames(pi) <- docID
+  
+  #theta and phi data.frames
+  theta <- as.data.frame(res$theta)
+  phi <- as.data.frame(res$phi)
+  
+  for (i in c(1:numSentiLabs)) {
+    for (j in c(1:numTopics)) {
+      names(theta)[j+numTopics*(i-1)] <- paste0('sent',i,'topic',j)
+      names(phi)[j+numTopics*(i-1)] <- paste0('sent',i,'topic',j)
+    }
+  }
+  
+  rownames(theta) <- docID
+  rownames(phi) <- word
+  
+  return(new('ASUM.result', 
+             pi = pi,
+             theta = theta,
+             phi = phi,
+             numTopics = numTopics,
+             numSentiments = numSentiLabs,
+             docvars = docvars))
+}
+
+#' @rdname topNwords-method
+#' @aliases topNwords,JST.result,numeric,numeric,numeric-method
+setMethod('topNwords', c('ASUM.result','numeric','numeric','numeric'),
+          function(x,N,topic,sentiment) {
+            colname <- paste('sent',sentiment,'topic',topic,sep='')
+            
+            column <- sapply(x@phi[colname],as.numeric)
+            
+            res <- rownames(x@phi)[topNwordSeeds(column,N)]
+            
+            res <- as.data.frame(res,stringsAsFactors = FALSE)
+            
+            names(res) <- colname
+            
+            return(res)
+          })
+
+#' @rdname topNwords-method
+#' @aliases topNwords,JST.result,numeric,-method
+setMethod('topNwords', c('ASUM.result','numeric'),
+          function(x,N) {
+            res <- as.data.frame(matrix(ncol = 0, nrow = N))
+            
+            for (topic in c(1:x@numTopics)) {
+              for (sentiment in c(1:x@numSentiments)) {
+                res <- cbind(res,topNwords(x,N,topic,sentiment))
+              }
+            }
+            
+            return(res)
+          })
+
+#' @rdname top20words-method
+#' @aliases top20words,JST.result,numeric,numeric-method
+setMethod('top20words', c('ASUM.result','numeric','numeric'),
+          function(x,topic,sentiment) {
+            return(topNwords(x,20,topic,sentiment))
+          })
+
+#' @rdname top20words-method
+#' @aliases top20words,JST.result-method
+setMethod('top20words', c('ASUM.result'),
+          function(x) {
+            return(topNwords(x,20))
+          })
+
+#' Tidy ASUM results
+#' 
+#' This method tidies up the results object for the selected parameter
+#' and returns a data.frame that conforms to the standards from the
+#' R tidyverse. See \pkg{broom} for the generic tidy method.
+#' 
+#' @param x A ASUM.result object
+#' @param parameter Character. The parameter to be tidied and returned. 
+#'        Note that no default is set.
+#' 
+#' @return A tidy data.frame.
+#' 
+#' @export
+tidy.ASUM.result <- function(x,parameter = NULL) {
+  if (is.null(parameter)) {
+    stop('Please specify which parameter from the object you would like to tidy')
+  } else if (parameter == 'pi') {
+    return (tidy.ASUM.result.pi(x))
+  } else if (parameter == 'theta') {
+    return (tidy.ASUM.result.theta(x))
+  } else if (parameter == 'phi') {
+    return (tidy.ASUM.result.phi(x))
+  } else {
+    stop(paste('\'',parameter,'\' is not a valid parameter of the ASUM.result model.',sep=''))
+  }
+}
+
+tidy.ASUM.result.pi <- function(x) {
+  docIDs <- rownames(x@pi)
+  return (cbind(docIDs,x@docvars,x@pi))
+}
+
+tidy.ASUM.result.theta <- function(x) {
+  res <- x@theta
+  res$docId <- rownames(res)
+  docvars <- x@docvars
+  
+  res <- merge(docvars,res,by='docId')
+  return(res)
+}
+
+tidy.ASUM.result.phi <- function(x) {
+  res <- x@phi
+  
+  res$word <- rownames(res)
+  res$word <- as.factor(res$word)
+  rownames(res) <- NULL
+  
+  res <- melt(res,id='word')
+  
+  variable <- as.character(res$variable)
+  variable <- gsub('sent','',variable)
+  topic <- as.numeric(substr(variable,start=1,stop=regexpr('t',variable)-1))
+  sentiment <- as.numeric(substr(variable,start=regexpr('c',variable)+1,stop=nchar(variable)))
+  
+  res <- cbind(res,topic,sentiment)
+  res <- subset(res,select=c('word','sentiment','topic','value'))
+  
   return(res)
 }

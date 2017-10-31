@@ -208,16 +208,17 @@ tidy.JST.result <- function(x,parameter = NULL) {
 }
 
 tidy.JST.result.pi <- function(x) {
-  docIDs <- rownames(x@pi)
-  return (cbind(docIDs,x@docvars,x@pi))
-}
-
-tidy.JST.result.theta <- function(x) {
-  res <- x@theta
   docvars <- x@docvars
   docvars$docID <- rownames(docvars)
   
-  res <- merge(docvars,res,by='docID')
+  return (cbind(docvars,x@pi))
+}
+
+tidy.JST.result.theta <- function(x) {
+  docvars <- x@docvars
+  docvars$docID <- rownames(docvars)
+  
+  res <- merge(docvars,x@theta,by='docID')
   return(res)
 }
 
@@ -232,8 +233,8 @@ tidy.JST.result.phi <- function(x) {
   
   variable <- as.character(res$variable)
   variable <- gsub('topic','',variable)
-  topic <- as.numeric(substr(variable,start=1,stop=regexpr('s',variable)-1))
-  sentiment <- as.numeric(substr(variable,start=regexpr('t',variable)+1,stop=nchar(variable)))
+  sentiment <- as.numeric(substr(variable,start=1,stop=regexpr('s',variable)-1))
+  topic <- as.numeric(substr(variable,start=regexpr('t',variable)+1,stop=nchar(variable)))
   
   res <- cbind(res,topic,sentiment)
   res <- subset(res,select=c('word','sentiment','topic','value'))
