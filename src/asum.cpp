@@ -71,7 +71,9 @@ void asummodel::init(Rcpp::IntegerVector& documentVector,
 
   for (int i = 0; i < sentiWords.size(); i++) {
     sentiLex.insert(std::pair<int,int>(sentiWords[i], sentiCategory[i]));
+    Rcpp::Rcout << sentiWords[i] << "-";
   }
+  Rcpp::Rcout << "\n";
 
   docSizes.resize(numDocs);
   std::fill(docSizes.begin(),docSizes.end(),0);
