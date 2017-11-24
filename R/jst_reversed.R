@@ -48,7 +48,7 @@ jst_reversed <- function(dfm,sentiLexInput=list(),
                 gamma = -1,
                 excludeNeutral = FALSE) {
   
-  if (!any(class(dfm) == 'dfmSparse')) {
+  if (!any(class(dfm) == 'dfm')) {
     stop('Please input a sparse quanteda dfm object as data.')
   }
   
