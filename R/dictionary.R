@@ -33,7 +33,7 @@ paradigm <- function() {
 #' @return A quanteda dictionary2 object with all elements stemmed
 #' 
 #' @export
-wordstem.Dictionary2 <- function(dict) {
+dictionary_wordstem <- function(dict) {
   sentiments <- names(dict)
   dictList <- as.list(dict)
   for (name in sentiments) {

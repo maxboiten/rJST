@@ -17,8 +17,7 @@ Imports: Rcpp (>= 0.12.12),
     broom,
     reshape2,
     stringi
-Depends: broom,
-    quanteda
+Depends: broom
 LinkingTo: Rcpp, RcppArmadillo, RcppEigen, RcppProgress
 RoxygenNote: 6.0.1
 Collate: 
