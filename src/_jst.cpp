@@ -5,7 +5,7 @@
 // [[Rcpp::depends(RcppArmadillo,RcppProgress)]]
 
 // [[Rcpp::export]]
-Rcpp::List jstcpp(arma::sp_imat& dfm,
+Rcpp::List jstcpp(arma::sp_mat& dfm,
         Rcpp::IntegerVector& sentiWords,
         Rcpp::IntegerVector& sentiCategory,
         int numSentiLabs,
@@ -135,7 +135,7 @@ void modeljst::init_estimate() {
   std::vector<int> locations(numDocs);
   std::fill(locations.begin(),locations.end(),0);
 
-  for (arma::sp_imat::iterator it = dfm->begin(); it != dfm->end(); it++) {
+  for (arma::sp_mat::iterator it = dfm->begin(); it != dfm->end(); ++it) {
     wordToken = it.col();
     document = it.row();
 
@@ -184,11 +184,11 @@ int modeljst::estimate() {
 
     std::fill(locations.begin(),locations.end(),0); //reset the locations
 
-    for (arma::sp_imat::iterator it = dfm->begin(); it != dfm->end(); it++) {
+    for (arma::sp_mat::iterator it = dfm->begin(); it != dfm->end(); ++it) {
       wordToken = it.col();
       document = it.row();
 
-      for (int i = 0; i < *it; i++) {
+      for (int i = 0; i < (int)*it; i++) {
         topic = topic_dw[document][locations[document]];
         sentilab = sent_dw[document][locations[document]];
 
@@ -344,7 +344,7 @@ void modeljst::set_beta() {
 		}
 	}
 
-  for (std::map<int,int>::iterator it = sentiLex.begin(); it != sentiLex.end(); it++) {
+  for (std::map<int,int>::iterator it = sentiLex.begin(); it != sentiLex.end(); ++it) {
     wordToken = it->first;
     //For each entry of the sentiment lexicon:
 		for (int l = 0; l < numSentiLabs; l++) {
