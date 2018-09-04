@@ -27,5 +27,5 @@ Collate:
     'jst.R'
     'jst_reversed.R'
     'rJST.R'
-RoxygenNote: 6.1.0.9000
 Encoding: UTF-8
+RoxygenNote: 6.1.0

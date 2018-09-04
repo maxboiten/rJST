@@ -1,9 +1,11 @@
-#include "_jstreversed.hpp"
+#include "_jst.hpp"
+
+//Class definition of model stored in header file
 
 // [[Rcpp::depends(RcppArmadillo,RcppProgress)]]
 
 // [[Rcpp::export]]
-Rcpp::List jstcppreversed(arma::sp_mat& dfm,
+Rcpp::List jstcpp(arma::sp_mat& dfm,
         Rcpp::IntegerVector& sentiWords,
         Rcpp::IntegerVector& sentiCategory,
         int numSentiLabs,
@@ -14,7 +16,7 @@ Rcpp::List jstcppreversed(arma::sp_mat& dfm,
         double beta_,
         double gamma_) {
 
-    modeljstrev * jst = new modeljstrev();
+    modeljst * jst = new modeljst();
 
     jst->numTopics = numTopics;
     jst->numSentiLabs = numSentiLabs;
@@ -36,7 +38,7 @@ Rcpp::List jstcppreversed(arma::sp_mat& dfm,
                              Rcpp::Named("phi.termScores") = jst->termScores());
 }
 
-void modeljstrev::init(Rcpp::IntegerVector& sentiWords, Rcpp::IntegerVector& sentiCategory) {
+void modeljst::init(Rcpp::IntegerVector& sentiWords, Rcpp::IntegerVector& sentiCategory) {
   numDocs = dfm->n_rows;
   vocabSize = dfm->n_cols;
 
@@ -55,7 +57,7 @@ void modeljstrev::init(Rcpp::IntegerVector& sentiWords, Rcpp::IntegerVector& sen
   init_estimate();
 }
 
-void modeljstrev::init_parameters() {
+void modeljst::init_parameters() {
   topic_dw.resize(numDocs);
   sent_dw.resize(numDocs);
   for (int d = 0; d < numDocs; d++) {
@@ -65,17 +67,14 @@ void modeljstrev::init_parameters() {
 
   //model counts
   nd.resize(numDocs);
-  ndz.resize(numDocs);
+  ndl.resize(numDocs);
   ndlz.resize(numDocs);
   for (int d = 0; d < numDocs; d++) {
     nd[d] = 0;
-    ndz[d].resize(numTopics);
-    for (int z = 0; z < numTopics; z++) {
-      ndz[d][z] = 0;
-    }
-
+    ndl[d].resize(numSentiLabs);
     ndlz[d].resize(numSentiLabs);
     for (int l = 0; l < numSentiLabs; l++) {
+      ndl[d][l] = 0;
       ndlz[d][l].resize(numTopics);
       for (int z = 0; z < numTopics; z++) {
         ndlz[d][l][z] = 0;
@@ -109,27 +108,25 @@ void modeljstrev::init_parameters() {
   set_gamma();
 
   //Result vectors
-  pi_zdl.resize(numTopics);
-  theta_zd.resize(numTopics);
-  for (int z = 0; z < numTopics; z++) {
-    theta_zd[z].resize(numDocs);
-    pi_zdl[z].resize(numDocs);
-    for (int d = 0; d < numDocs; d++) {
-      pi_zdl[z][d].resize(numSentiLabs);
-    }
+  pi_dl.resize(numDocs); // size: (numDocs x L)
+  for (int d = 0; d < numDocs; d++) {
+    pi_dl[d].resize(numSentiLabs);
   }
 
-	phi_zlw.resize(numTopics); // size: (L x T x V)
-  for (int z = 0; z < numTopics; z++) {
-    phi_zlw[z].resize(numSentiLabs);
-    for (int l = 0; l < numSentiLabs; l++) {
-      phi_zlw[z][l].resize(vocabSize);
+	phi_lzw.resize(numSentiLabs); // size: (L x T x V)
+	theta_lzd.resize(numSentiLabs); // size: (numDocs x L x T)
+  for (int l = 0; l < numSentiLabs; l++) {
+    phi_lzw[l].resize(numTopics);
+    theta_lzd[l].resize(numTopics);
+    for (int z = 0; z < numTopics; z++) {
+      phi_lzw[l][z].resize(vocabSize);
+      theta_lzd[l][z].resize(numDocs);
     }
   }
 
 }
 
-void modeljstrev::init_estimate() {
+void modeljst::init_estimate() {
   srand(time(NULL));
 
   int document, wordToken, priorSent, topic, sentilab;
@@ -138,7 +135,7 @@ void modeljstrev::init_estimate() {
   std::vector<int> locations(numDocs);
   std::fill(locations.begin(),locations.end(),0);
 
-  for (arma::sp_mat::iterator it = dfm->begin(); it != dfm->end(); ++it) {
+  for (arma::sp_mat::iterator it = dfm->begin(); it != dfm->end(); it++) {
     wordToken = it.col();
     document = it.row();
 
@@ -156,7 +153,6 @@ void modeljstrev::init_estimate() {
       } else {
         sentilab = priorSent;
       }
-
       topic = rand() % numTopics;
 
       topic_dw[document][locations[document]] = topic;
@@ -165,7 +161,7 @@ void modeljstrev::init_estimate() {
       locations[document]++;
 
       nd[document]++;
-      ndz[document][topic]++;
+      ndl[document][sentilab]++;
       ndlz[document][sentilab][topic]++;
       nlzw[sentilab][topic][wordToken]++;
       nlz[sentilab][topic]++;
@@ -173,13 +169,14 @@ void modeljstrev::init_estimate() {
   }
 }
 
-int modeljstrev::estimate() {
+int modeljst::estimate() {
   int document, wordToken, topic, sentilab;
   std::vector<int> locations(numDocs);
+  std::pair<int,int> topicSent;
 
   Progress p(numiters,true);
 
-  for (int iter = 1; iter <= numiters; iter++) {
+  for (int iter = 1; iter < numiters; iter++) {
     if (Progress::check_abort()) {
       Rcpp::Rcout << "Process aborted at iteration " << iter << std::endl;
       return 1;
@@ -187,22 +184,22 @@ int modeljstrev::estimate() {
 
     std::fill(locations.begin(),locations.end(),0); //reset the locations
 
-    for (arma::sp_mat::iterator it = dfm->begin(); it != dfm->end(); ++it) {
+    for (arma::sp_mat::iterator it = dfm->begin(); it != dfm->end(); it++) {
       wordToken = it.col();
       document = it.row();
 
-      for (int i = 0; i < (int)(*it); i++) {
+      for (int i = 0; i < (int)*it; i++) {
         topic = topic_dw[document][locations[document]];
         sentilab = sent_dw[document][locations[document]];
 
         //Remove word from counts
         nd[document]--;
-        ndz[document][topic]--;
+        ndl[document][sentilab]--;
         ndlz[document][sentilab][topic]--;
         nlzw[sentilab][topic][wordToken]--;
         nlz[sentilab][topic]--;
 
-        //sample from bivariate distribution. topic and sentilab are changed by the method
+        //sample from bivariate distribution.
         drawsample(document,wordToken,topic,sentilab);
 
         topic_dw[document][locations[document]] = topic;
@@ -210,7 +207,7 @@ int modeljstrev::estimate() {
 
         //Add word back to counts with new labels
         nd[document]++;
-        ndz[document][topic]++;
+        ndl[document][sentilab]++;
         ndlz[document][sentilab][topic]++;
         nlzw[sentilab][topic][wordToken]++;
         nlz[sentilab][topic]++;
@@ -227,22 +224,22 @@ int modeljstrev::estimate() {
   }
 
   //Compute parameter values
-  compute_pi_zdl();
-  compute_theta_zd();
-  compute_phi_zlw();
+  compute_pi_dl();
+  compute_theta_lzd();
+  compute_phi_lzw();
 
   return 0;
 }
 
-void modeljstrev::drawsample(int d, int w, int& topic, int& sentilab) {
+void modeljst::drawsample(int d, int w, int& topic, int& sentilab) {
   double u;
 
   // do multinomial sampling via cumulative method
 	for (int l = 0; l < numSentiLabs; l++) {
 		for (int z = 0; z < numTopics; z++) {
 			p_lz[l][z] = (nlzw[l][z][w] + beta_lzw[l][z][w]) / (nlz[l][z] + betaSum_lz[l][z])
-                    * (ndlz[d][l][z] + gamma_zl[z][l]) / (ndz[d][z] + gammaSum_z[z])
-                    * (ndz[d][z] + alpha_dz[d][z]) / (nd[d] + alphaSum_d[d]);
+                    * (ndlz[d][l][z] + alpha_lz[l][z]) / (ndl[d][l] + alphaSum_l[l])
+                    * (ndl[d][l] + gamma_dl[d][l]) / (nd[d] + gammaSum_d[d]);
 		}
   }
 
@@ -271,52 +268,52 @@ void modeljstrev::drawsample(int d, int w, int& topic, int& sentilab) {
 		}
 		if (loopBreak == true) {
 			break;
-		}
+    }
 	}
 
 	if (sentilab == numSentiLabs) sentilab--; // to avoid over array boundary
-	if (topic == numTopics) topic--;
+  if (topic == numTopics) topic--;
 }
 
-void modeljstrev::set_gamma() {
+void modeljst::set_gamma() {
 
 	if (gamma_ <= 0 ) {
-		gamma_ = (double)aveDocSize * 0.05 / (double)(numSentiLabs * numTopics);
+		gamma_ = (double)aveDocSize * 0.05 / (double)numSentiLabs;
 	}
 
-	gamma_zl.resize(numTopics);
-	gammaSum_z.resize(numTopics);
+	gamma_dl.resize(numDocs);
+	gammaSum_d.resize(numDocs);
 
-	for (int z = 0; z < numTopics; z++) {
-		gamma_zl[z].resize(numSentiLabs);
-    gammaSum_z[z] = 0;
+	for (int d = 0; d < numDocs; d++) {
+		gamma_dl[d].resize(numSentiLabs);
+    gammaSum_d[d] = 0;
     for (int l = 0; l < numSentiLabs; l++) {
-      gamma_zl[z][l] = gamma_;
-      gammaSum_z[z] += gamma_;
+      gamma_dl[d][l] = gamma_;
+      gammaSum_d[d] += gamma_;
     }
 	}
 }
 
-void modeljstrev::set_alpha() {
+void modeljst::set_alpha() {
 
   //Set alpha to default
   if (alpha_ <= 0) {
-		alpha_ =  (double)aveDocSize * 0.05 / (double)numTopics;
+		alpha_ =  (double)aveDocSize * 0.05 / (double)(numSentiLabs * numTopics);
 	}
 
-  alpha_dz.resize(numDocs);
-  alphaSum_d.resize(numDocs);
-	for (int d = 0; d < numDocs; d++) {
-		alpha_dz[d].resize(numTopics);
-    alphaSum_d[d] = 0;
+  alpha_lz.resize(numSentiLabs);
+  alphaSum_l.resize(numSentiLabs);
+	for (int l = 0; l < numSentiLabs; l++) {
+		alpha_lz[l].resize(numTopics);
+    alphaSum_l[l] = 0;
     for (int z = 0; z < numTopics; z++) {
-      alpha_dz[d][z] = alpha_;
-      alphaSum_d[d] += alpha_;
+      alpha_lz[l][z] = alpha_;
+      alphaSum_l[l] += alpha_;
     }
 	}
 }
 
-void modeljstrev::set_beta() {
+void modeljst::set_beta() {
   int wordToken;
   std::vector<std::vector<double> > lambda_lw;
 
@@ -347,7 +344,7 @@ void modeljstrev::set_beta() {
 		}
 	}
 
-  for (std::map<int,int>::iterator it = sentiLex.begin(); it != sentiLex.end(); ++it) {
+  for (std::map<int,int>::iterator it = sentiLex.begin(); it != sentiLex.end(); it++) {
     wordToken = it->first;
     //For each entry of the sentiment lexicon:
 		for (int l = 0; l < numSentiLabs; l++) {
@@ -369,70 +366,60 @@ void modeljstrev::set_beta() {
 	}
 }
 
-void modeljstrev::compute_phi_zlw() {
+void modeljst::compute_phi_lzw() {
 	for (int l = 0; l < numSentiLabs; l++)  {
 	  for (int z = 0; z < numTopics; z++) {
 			for(int w = 0; w < vocabSize; w++) {
-				phi_zlw[z][l][w] = (nlzw[l][z][w] + beta_lzw[l][z][w]) / (nlz[l][z] + betaSum_lz[l][z]);
+        phi_lzw[l][z][w] = (nlzw[l][z][w] + beta_lzw[l][z][w]) / (nlz[l][z] + betaSum_lz[l][z]);
 			}
 		}
 	}
 }
 
-void modeljstrev::compute_pi_zdl() {
+void modeljst::compute_pi_dl() {
 	for (int d = 0; d < numDocs; d++) {
-	  for (int l = 0; l < numSentiLabs; l++) {
-      for (int z = 0; z < numTopics; z++) {
-        pi_zdl[z][d][l] = (ndlz[d][l][z] + gamma_zl[z][l]) / (ndz[d][z] + gammaSum_z[z]);
-      }
+	    for (int l = 0; l < numSentiLabs; l++) {
+		    pi_dl[d][l] = (ndl[d][l] + gamma_dl[d][l]) / (nd[d] + gammaSum_d[d]);
 		}
 	}
 }
 
-void modeljstrev::compute_theta_zd() {
+void modeljst::compute_theta_lzd() {
 	for (int d = 0; d < numDocs; d++) {
-	  for (int z = 0; z < numTopics; z++)  {
-			 theta_zd[z][d] = (ndz[d][z] + alpha_dz[d][z]) / (nd[d] + alphaSum_d[d]);
+	  for (int l = 0; l < numSentiLabs; l++)  {
+			for (int z = 0; z < numTopics; z++) {
+        theta_lzd[l][z][d] = (ndlz[d][l][z] + alpha_lz[l][z]) / (ndl[d][l] + alphaSum_l[l]);
+			}
 		}
 	}
 }
 
-std::vector<std::vector<std::vector<double> > > modeljstrev::termScores() {
+std::vector<std::vector<std::vector<double> > > modeljst::termScores() {
 
   std::vector<std::vector<std::vector<double> > > termScores;
-  double product;
 
-  std::vector<std::vector<double> > prod_wz;
-  prod_wz.resize(vocabSize);
+  std::vector<double> prod_w(vocabSize);
+  std::fill(prod_w.begin(),prod_w.end(),1.0);
 
-  for (int w = 0; w < vocabSize; w++ ) {
-    prod_wz[w].resize(numTopics);
-    std::fill(prod_wz[w].begin(),prod_wz[w].end(),1.0);
-  }
-
-  for (int w = 0; w < vocabSize; w++) {
+  for (int l = 0; l < numSentiLabs; l++) {
     for (int z = 0; z < numTopics; z++) {
-      product = 1.0;
-      for (int l = 0; l < numSentiLabs; l++) {
-        product *= phi_zlw[z][l][w];
-      }
-      prod_wz[w][z] = pow(product,(1.0/(double)(numTopics)));
-    }
-  }
-
-  for (int w = 0; w < vocabSize; w++) {
-    for (int z = 0; z < numTopics; z++) {
-
-    }
-  }
-
-  termScores.resize(numTopics);
-  for (int z = 0; z < numTopics; z++) {
-    termScores[z].resize(numSentiLabs);
-    for (int l = 0; l < numSentiLabs; l++) {
-      termScores[z][l].resize(vocabSize);
       for (int w = 0; w < vocabSize; w++) {
-        termScores[z][l][w] = phi_zlw[z][l][w] * log(phi_zlw[z][l][w]/prod_wz[w][z]);
+        prod_w[w] *= phi_lzw[l][z][w];
+      }
+    }
+  }
+
+  for (int w = 0; w < vocabSize; w++) {
+    prod_w[w] = pow(prod_w[w],1.0/(double)(numTopics*numSentiLabs));
+  }
+
+  termScores.resize(numSentiLabs);
+  for (int l = 0; l < numSentiLabs; l++) {
+    termScores[l].resize(numTopics);
+    for (int z = 0; z < numTopics; z++) {
+      termScores[l][z].resize(vocabSize);
+      for (int w = 0; w < vocabSize; w++) {
+        termScores[l][z][w] = phi_lzw[l][z][w] * log(phi_lzw[l][z][w]/prod_w[w]);
       }
     }
   }
@@ -440,42 +427,42 @@ std::vector<std::vector<std::vector<double> > > modeljstrev::termScores() {
   return termScores;
 }
 
-void modeljstrev::update_Parameters() {
+void modeljst::update_Parameters() {
 
 	int ** data; // temp valuable for exporting 3-dimentional array to 2-dimentional
-	double * gamma_temp;
-	data = new int*[numSentiLabs];
-	for (int l = 0; l < numSentiLabs; l++) {
-		data[l] = new int[numDocs];
+	double * alpha_temp;
+	data = new int*[numTopics];
+	for (int z = 0; z < numTopics; z++) {
+		data[z] = new int[numDocs];
 		for (int d = 0; d < numDocs; d++) {
-			data[l][d] = 0;
+			data[z][d] = 0;
 		}
 	}
 
-	gamma_temp = new double[numSentiLabs];
-	for (int l = 0; l < numSentiLabs; l++){
-		gamma_temp[l] = 0.0;
+	alpha_temp = new double[numTopics];
+	for (int z = 0; z < numTopics; z++){
+		alpha_temp[z] = 0.0;
 	}
 
-	// update gamma
-	for (int z = 0; z < numTopics; z++) {
-		for (int l = 0; l < numSentiLabs; l++) {
+	// update alpha
+	for (int l = 0; l < numSentiLabs; l++) {
+		for (int z = 0; z < numTopics; z++) {
 			for (int d = 0; d < numDocs; d++) {
-				data[l][d] = ndlz[d][l][z]; // ntldsum[j][k][m];
+				data[z][d] = ndlz[d][l][z]; // ntldsum[j][k][m];
 			}
 		}
 
-		for (int l = 0; l < numSentiLabs; l++) {
-			gamma_temp[l] =  gamma_zl[z][l];
+		for (int z = 0; z < numTopics; z++) {
+			alpha_temp[z] =  alpha_lz[l][z]; //alpha[j][k];
 		}
 
-		polya_fit_simple(data, gamma_temp, numSentiLabs, numDocs);
+		polya_fit_simple(data, alpha_temp, numTopics, numDocs);
 
 		// update alpha
-		gammaSum_z[z] = 0.0;
-		for (int l = 0; l < numSentiLabs; l++) {
-			gamma_zl[z][l] = gamma_temp[l];
-			gammaSum_z[z] += gamma_zl[z][l];
+		alphaSum_l[l] = 0.0;
+		for (int z = 0; z < numTopics; z++) {
+			alpha_lz[l][z] = alpha_temp[z];
+			alphaSum_l[l] += alpha_lz[l][z];
 		}
 	}
 }
