@@ -6,4 +6,6 @@
 #include <utility>
 #include <algorithm>
 
+Rcpp::NumericVector topNwordSeeds(Rcpp::NumericVector& wordParameters, int N);
+
 #endif

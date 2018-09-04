@@ -9,18 +9,6 @@ jstcppreversed <- function(dfm, sentiWords, sentiCategory, numSentiLabs, numTopi
     .Call('_rJST_jstcppreversed', PACKAGE = 'rJST', dfm, sentiWords, sentiCategory, numSentiLabs, numTopics, numiters, updateParaStep, alpha_, beta_, gamma_)
 }
 
-gibbsldacpp <- function(dfm, numTopics, numiters, alpha_, beta_) {
-    .Call('_rJST_gibbsldacpp', PACKAGE = 'rJST', dfm, numTopics, numiters, alpha_, beta_)
-}
-
-sldacpp <- function(sfm, documentVector, sentenceVector, numTopics, numiters, alpha_, beta_) {
-    .Call('_rJST_sldacpp', PACKAGE = 'rJST', sfm, documentVector, sentenceVector, numTopics, numiters, alpha_, beta_)
-}
-
-asumcpp <- function(sfm, documentVector, sentenceVector, sentiWords, sentiCategory, numSentiLabs, numTopics, numiters, alpha, gamma, betaVec) {
-    .Call('_rJST_asumcpp', PACKAGE = 'rJST', sfm, documentVector, sentenceVector, sentiWords, sentiCategory, numSentiLabs, numTopics, numiters, alpha, gamma, betaVec)
-}
-
 topNwordSeeds <- function(wordParameters, N) {
     .Call('_rJST_topNwordSeeds', PACKAGE = 'rJST', wordParameters, N)
 }

@@ -1,7 +1,7 @@
 // This file contains standalone methods for the package that would otherwise be slow in R,
 // but do not require a model by themselves.
 
-#include "standalonemethods.h"
+#include "standalonemethods.hpp"
 
 /*
 method topNwordSeeds

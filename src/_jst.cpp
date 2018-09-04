@@ -1,4 +1,4 @@
-#include "_jst.h"
+#include "_jst.hpp"
 
 //Class definition of model stored in header file
 
