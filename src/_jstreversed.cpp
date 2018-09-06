@@ -130,7 +130,6 @@ void modeljstrev::init_parameters() {
 }
 
 void modeljstrev::init_estimate() {
-  srand(time(NULL));
 
   int document, wordToken, priorSent, topic, sentilab;
   std::map<int,int>::iterator sentiIt;
@@ -152,12 +151,12 @@ void modeljstrev::init_estimate() {
     for (int i = 0; i < (int)(*it); i++) {
 
       if (priorSent == -1) {
-        sentilab = rand() % numSentiLabs;
+        sentilab = floor(Rcpp::runif(1)[0]*numSentiLabs);
       } else {
         sentilab = priorSent;
       }
 
-      topic = rand() % numTopics;
+      topic = floor(Rcpp::runif(1)[0]*numTopics);
 
       topic_dw[document][locations[document]] = topic;
       sent_dw[document][locations[document]] = sentilab;
@@ -258,7 +257,7 @@ void modeljstrev::drawsample(int d, int w, int& topic, int& sentilab) {
 	}
 
 	// probability normalization
-	u = ((double)rand() / RAND_MAX) * p_lz[numSentiLabs-1][numTopics-1];
+	u = (double)Rcpp::runif(1)[0] * p_lz[numSentiLabs-1][numTopics-1];
 
 	// sample sentiment label l, where l \in [0, S-1]
 	bool loopBreak=false;

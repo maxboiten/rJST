@@ -20,15 +20,15 @@ turned off by setting \code{excludeNeutral = TRUE}.}
 
 \item{numTopics}{Integer, the number of topics (defaults to 10)}
 
-\item{numIters}{Integer, the number of iterations (defaults to ???)}
+\item{numIters}{Integer, the number of iterations (defaults to 3 for test runs, optimize by hand)}
 
 \item{updateParaStep}{Integer. The number of iterations between optimizations of hyperparameter alpha}
 
-\item{alpha}{Double, hyperparameter for (defaults to)}
+\item{alpha}{Double, hyperparameter for (defaults to .05 * (average docsize/number of sentitopics))}
 
-\item{beta}{Double, hyperparameter for (defaults to)}
+\item{beta}{Double, hyperparameter for (defaults to .01, with multiplier .9/.1 for sentiment dictionary presence)}
 
-\item{gamma}{Double, hyperparameter for (defaults to)}
+\item{gamma}{Double, hyperparameter for (defaults to .05 * (average docsize/number of sentiment categories))}
 
 \item{excludeNeutral}{Boolean. If a dictionary is used, an extra category is added for neutral
 words. Words in the dictionary receive a low probability of being allocated there. If this is set
@@ -39,5 +39,16 @@ dictionary is used. Defaults to \code{FALSE}.}
 A JST.result object containing a data.frame for each estimated parameter
 }
 \description{
-Run a Joint Sentiment Topic model
+Estimates a joint sentiment topic model using a Gibbs sampler, see Details for model description.
+}
+\details{
+Basic model description:
+
+Lin, C. and He, Y., 2009, November. Joint sentiment/topic model for sentiment analysis. In 
+Proceedings of the 18th ACM conference on Information and knowledge management (pp. 375-384). ACM.
+
+Weak supervision adopted from:
+
+Lin, C., He, Y., Everson, R. and Ruger, S., 2012. Weakly supervised joint sentiment-topic 
+detection from text. IEEE Transactions on Knowledge and Data engineering, 24(6), pp.1134-1145.
 }

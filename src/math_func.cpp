@@ -632,8 +632,6 @@ void timestamp ( void )
 
   len = strftime ( time_buffer, TIME_SIZE, "%d %B %Y %I:%M:%S %p", tm );
 
-  cout << time_buffer << "\n";
-
   return;
 # undef TIME_SIZE
 }

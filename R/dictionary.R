@@ -21,7 +21,7 @@ paradigm <- function() {
                'boring','stupid','slow','worst','waste','unexcited','rubbish',
                'tedious','unbearable','pointless','cheesy','frustrated','awkward',
                'disappointing')
-  return(dictionary(list('positive'=positive,'negative'=negative)))
+  return(quanteda::dictionary(list('positive'=positive,'negative'=negative)))
 }
 
 #' Wordstem a quanteda Dictionary2 object
@@ -37,7 +37,7 @@ dictionary_wordstem <- function(dict) {
   sentiments <- names(dict)
   dictList <- as.list(dict)
   for (name in sentiments) {
-    dictList[[name]] %<>% SnowballC::wordStem(language='porter') %>% unique
+    dictList[[name]] <- unique(SnowballC::wordStem(dictList[[name]], language='porter'))
   }
-  return(dictionary(dictList))
+  return(quanteda::dictionary(dictList))
 }

@@ -20,16 +20,16 @@ turned off by setting \code{excludeNeutral = TRUE}.}
 
 \item{numTopics}{Integer, the number of topics (defaults to 10)}
 
-\item{numIters}{Integer, the number of iterations (defaults to ???)}
+\item{numIters}{Integer, the number of iterations (defaults to 3 for test runs, optimize by hand)}
 
 \item{updateParaStep}{Integer. The number of iterations between optimizations 
 of hyperparameter alpha}
 
-\item{alpha}{Double, hyperparameter for (defaults to)}
+\item{alpha}{Double, hyperparameter for (defaults to .05*(average docsize/number of topics))}
 
-\item{beta}{Double, hyperparameter for (defaults to)}
+\item{beta}{Double, hyperparameter for (defaults to .01, with multiplier .9/.1 for sentiment dictionary presence)}
 
-\item{gamma}{Double, hyperparameter for (defaults to)}
+\item{gamma}{Double, hyperparameter for (defaults to .05 * (average docsize/number of sentitopics)}
 
 \item{excludeNeutral}{Boolean. If a dictionary is used, an extra category is added for neutral
 words. Words in the dictionary receive a low probability of being allocated there. If this is set
@@ -41,6 +41,9 @@ A JST_reversed.result object containing a data.frame for each estimated
 parameter
 }
 \description{
-Note: For explanations on the reversed JST, send me an email, although it runs 
-it is still work in progress.
+Estimates a reversed joint sentiment topic model using a Gibbs sampler, see Details for model description.
+}
+\details{
+Lin, C., He, Y., Everson, R. and Ruger, S., 2012. Weakly supervised joint sentiment-topic 
+detection from text. IEEE Transactions on Knowledge and Data engineering, 24(6), pp.1134-1145.
 }

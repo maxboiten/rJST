@@ -5,8 +5,6 @@
 #include <progress.hpp>
 #include <progress_bar.hpp>
 #include "polya_fit_simple.hpp"
-#include <stdlib.h>
-#include <time.h>
 #include <math.h>
 #include <vector>
 #include <algorithm>

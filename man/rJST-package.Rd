@@ -14,11 +14,6 @@ all models have a defined tidy method. See \pkg{broom} for more
 information.
 }
 \author{
-\strong{Maintainer}: 
-
-Other contributors:
-\itemize{
-  \item Max Boiten Maintainer \email{max_boiten@live.nl}
-}
+\strong{Maintainer}: Max Boiten \email{max_boiten@live.nl}
 
 }
