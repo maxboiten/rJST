@@ -6,15 +6,14 @@ Date: 2018-09-04
 Authors@R: person(given='Max', family='Boiten',role='cre',email='max_boiten@live.nl')
 Author: Max Boiten
 Maintainer: Max Boiten <max_boiten@live.nl>
-Description: The package runs a Joint Sentiment Topic model, as described by Lin and He, 2009.
-    Currently, the model can only estimate parameters based on a corpus and not use these estimates
-    for inference.
+Description: The package estimates the Joint Sentiment Topic model and its reversed variety, 
+    as described by Lin and He, 2009. See model descriptions for full citations.
 License: GPL-3
-Imports: quanteda,
-    reshape2,
+Imports: reshape2,
     Rcpp (>= 0.12.12),
     RcppProgress,
     SnowballC
+Depends: quanteda
 LinkingTo: Rcpp, RcppArmadillo, RcppProgress
 Collate: 
     'RcppExports.R'

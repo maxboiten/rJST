@@ -1,4 +1,4 @@
-#include "_jstreversed.hpp"
+#include "_jstreversed.h"
 
 // [[Rcpp::depends(RcppArmadillo,RcppProgress)]]
 
