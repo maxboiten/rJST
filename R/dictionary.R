@@ -36,8 +36,9 @@ paradigm <- function() {
 dictionary_wordstem <- function(dict) {
   sentiments <- names(dict)
   dictList <- as.list(dict)
+  newdict <- list()
   for (name in sentiments) {
-    dictList[[name]] <- unique(SnowballC::wordStem(dictList[[name]], language='porter'))
+    newdict[[name]] <- unique(SnowballC::wordStem(dictList[[name]], language='porter'))
   }
-  return(quanteda::dictionary(dictList))
+  return(quanteda::dictionary(newdict))
 }

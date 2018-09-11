@@ -17,6 +17,12 @@
 #' @export
 #' @docType methods
 #' @rdname topNwords-method
+#' 
+#' @examples 
+#' \dontrun{
+#' model <- jst(dfm,paradigm())
+#' topNwords(model, N = 30, topic = 1, sentiment = 1)
+#' }
 setGeneric(name='topNwords', function(x,N,topic=NULL,sentiment=NULL) {
   standardGeneric('topNwords')
 })
@@ -40,6 +46,12 @@ setGeneric(name='topNwords', function(x,N,topic=NULL,sentiment=NULL) {
 #' @export
 #' @docType methods
 #' @rdname top20words-method
+#' 
+#' @examples 
+#' \dontrun{
+#' model <- jst(dfm,paradigm())
+#' top20words(model, topic = 1, sentiment = 1)
+#' }
 setGeneric(name='top20words',function(x,topic=NULL,sentiment=NULL) {
   standardGeneric('top20words')
 })

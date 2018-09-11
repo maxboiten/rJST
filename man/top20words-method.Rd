@@ -42,3 +42,9 @@ If topic (and sentiment for the appropriate models) are not specified, the
 top 20 words of every topic will be returned.This method calls the generic
 \link{topNwords} method.
 }
+\examples{
+\dontrun{
+model <- jst(dfm,paradigm())
+top20words(model, topic = 1, sentiment = 1)
+}
+}

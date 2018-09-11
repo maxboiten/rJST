@@ -1,4 +1,5 @@
 #' @include topNwords.R
+#' @importFrom methods new
 
 #' @title Reverse JST results object
 #' 

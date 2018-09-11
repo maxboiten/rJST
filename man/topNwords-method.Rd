@@ -43,3 +43,9 @@ estimated parameter values for any of the models estimated in this package.
 If topic (and sentiment for the appropriate models) are not specified, the
 top N words of every topic will be returned.
 }
+\examples{
+\dontrun{
+model <- jst(dfm,paradigm())
+topNwords(model, N = 30, topic = 1, sentiment = 1)
+}
+}

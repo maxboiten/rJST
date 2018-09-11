@@ -1,21 +1,23 @@
 Package: rJST
 Type: Package
-Title: Joint Sentiment Topic modelling
+Title: Joint Sentiment Topic Modelling
 Version: 1.0
 Date: 2018-09-04
-Authors@R: person(given='Max', family='Boiten',role='cre',email='max_boiten@live.nl')
-Author: Max Boiten
+Authors@R: person(given='Max', family='Boiten',role=c('cre','aut'),email='max_boiten@live.nl')
 Maintainer: Max Boiten <max_boiten@live.nl>
-Description: The package estimates the Joint Sentiment Topic model and its reversed variety, 
+Description: Estimates the Joint Sentiment Topic model and its reversed variety, 
     as described by Lin and He, 2009. See model descriptions for full citations.
 License: GPL-3
-Imports: reshape2,
+Imports: magrittr,
+    quanteda,
+    reshape2,
     Rcpp (>= 0.12.12),
     RcppProgress,
     SnowballC
-Depends: quanteda
+Depends: methods
+Suggests: knitr, rmarkdown
 LinkingTo: Rcpp, RcppArmadillo, RcppProgress
-Collate: 
+Collate:
     'RcppExports.R'
     'dictionary.R'
     'topNwords.R'
@@ -25,3 +27,4 @@ Collate:
     'rJST.R'
 Encoding: UTF-8
 RoxygenNote: 6.0.1
+VignetteBuilder: knitr
