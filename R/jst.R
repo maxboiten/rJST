@@ -62,6 +62,9 @@ is.JST.result <- function(x) {
 #' to \code{TRUE}, the neutral sentiment category will be omitted. The variable is irrelevant if no
 #' dictionary is used. Defaults to \code{FALSE}.
 #' @return A JST.result object containing a data.frame for each estimated parameter
+#' 
+#' @examples 
+#' model <- jst(quanteda::data_corpus_irishbudget2010, paradigm(), numTopics = 5, numIters = 250)
 #' @export
 jst <- function(dfm,sentiLexInput=list(),
                 numSentiLabs = 3,

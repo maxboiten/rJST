@@ -11,6 +11,12 @@
 #' 
 #' @return A data.frame.
 #' 
+#' @examples 
+#' data <- quanteda::dfm(quanteda::data_corpus_irishbudget2010)
+#' model <- jst(data, paradigm(), numTopics = 5, numIters = 250)
+#' 
+#' theta <- get_parameter(model, 'phi')
+#' 
 #' @export
 get_parameter <- function(x,parameter = NULL) {
   if (is.JST_reversed.result(x)) {

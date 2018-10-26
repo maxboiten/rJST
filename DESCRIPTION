@@ -3,10 +3,13 @@ Type: Package
 Title: Joint Sentiment Topic Modelling
 Version: 1.0
 Date: 2018-09-04
-Authors@R: person(given='Max', family='Boiten',role=c('cre','aut'),email='max_boiten@live.nl')
+Authors@R: c(person(given='Max', family='Boiten',role=c('cre','aut'),email='max_boiten@live.nl'), 
+	person(given='Chenghua', family='Lin', role='cph'), 
+	person(given='He', family='Yulan', role='cph'))
 Maintainer: Max Boiten <max_boiten@live.nl>
 Description: Estimates the Joint Sentiment Topic model and its reversed variety, 
-    as described by Lin and He, 2009. See model descriptions for full citations.
+    as described by Lin and He, 2009 <DOI:10.1145/1645953.1646003> and Lin, He, Everson and Ruger 
+    (2012) <DOI:10.1109/TKDE.2011.48>.
 License: GPL-3
 Imports: magrittr,
     quanteda,

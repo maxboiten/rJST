@@ -19,10 +19,8 @@
 #' @rdname topNwords-method
 #' 
 #' @examples 
-#' \dontrun{
-#' model <- jst(dfm,paradigm())
-#' topNwords(model, N = 30, topic = 1, sentiment = 1)
-#' }
+#' model <- jst(quanteda::data_dfm_lbgexample, paradigm())
+#' topNwords(model, N = 30, topic = 2, sentiment = 1)
 setGeneric(name='topNwords', function(x,N,topic=NULL,sentiment=NULL) {
   standardGeneric('topNwords')
 })
@@ -48,10 +46,8 @@ setGeneric(name='topNwords', function(x,N,topic=NULL,sentiment=NULL) {
 #' @rdname top20words-method
 #' 
 #' @examples 
-#' \dontrun{
-#' model <- jst(dfm,paradigm())
+#' model <- jst(quanteda::data_dfm_lbgexample, paradigm())
 #' top20words(model, topic = 1, sentiment = 1)
-#' }
 setGeneric(name='top20words',function(x,topic=NULL,sentiment=NULL) {
   standardGeneric('top20words')
 })
