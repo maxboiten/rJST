@@ -13,9 +13,9 @@
 #' 
 #' @examples 
 #' data <- quanteda::dfm(quanteda::data_corpus_irishbudget2010)
-#' model <- jst(data, paradigm(), numTopics = 5, numIters = 250)
+#' model <- jst(data, paradigm(), numTopics = 5, numIters = 50)
 #' 
-#' theta <- get_parameter(model, 'phi')
+#' phi <- get_parameter(model, 'phi')
 #' 
 #' @export
 get_parameter <- function(x,parameter = NULL) {

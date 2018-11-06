@@ -43,8 +43,6 @@ top 20 words of every topic will be returned.This method calls the generic
 \link{topNwords} method.
 }
 \examples{
-\dontrun{
-model <- jst(dfm,paradigm())
+model <- jst(quanteda::data_dfm_lbgexample, paradigm())
 top20words(model, topic = 1, sentiment = 1)
-}
 }

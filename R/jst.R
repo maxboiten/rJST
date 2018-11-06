@@ -64,7 +64,10 @@ is.JST.result <- function(x) {
 #' @return A JST.result object containing a data.frame for each estimated parameter
 #' 
 #' @examples 
-#' model <- jst(quanteda::data_corpus_irishbudget2010, paradigm(), numTopics = 5, numIters = 250)
+#' model <- jst(quanteda::dfm(quanteda::data_corpus_irishbudget2010), 
+#'              paradigm(), 
+#'              numTopics = 5, 
+#'              numIters = 150)
 #' @export
 jst <- function(dfm,sentiLexInput=list(),
                 numSentiLabs = 3,

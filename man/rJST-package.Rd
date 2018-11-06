@@ -16,4 +16,10 @@ information.
 \author{
 \strong{Maintainer}: Max Boiten \email{max_boiten@live.nl}
 
+Other contributors:
+\itemize{
+  \item Chenghua Lin [copyright holder]
+  \item Yulan He [copyright holder]
+}
+
 }
