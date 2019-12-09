@@ -1,8 +1,8 @@
 Package: rJST
 Type: Package
 Title: Joint Sentiment Topic Modelling
-Version: 1.0
-Date: 2018-11-02
+Version: 1.1
+Date: 2019-12-09
 Authors@R: c(person(given='Max', family='Boiten',role=c('cre','aut'),email='max_boiten@live.nl'), 
 	person(given='Chenghua', family='Lin', role='cph'), 
 	person(given='Yulan', family='He', role='cph'))
@@ -14,7 +14,7 @@ License: GPL-3
 Imports: magrittr,
     quanteda,
     reshape2,
-    Rcpp (>= 0.12.12),
+    Rcpp,
     RcppProgress,
     SnowballC
 Depends: methods
@@ -29,5 +29,5 @@ Collate:
     'get_parameter.R'
     'rJST.R'
 Encoding: UTF-8
-RoxygenNote: 6.0.1
+RoxygenNote: 7.0.2
 VignetteBuilder: knitr

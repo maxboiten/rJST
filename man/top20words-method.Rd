@@ -13,13 +13,11 @@
 \usage{
 top20words(x, topic = NULL, sentiment = NULL)
 
-\S4method{top20words}{JST_reversed.result,numeric,numeric}(x, topic = NULL,
-  sentiment = NULL)
+\S4method{top20words}{JST_reversed.result,numeric,numeric}(x, topic = NULL, sentiment = NULL)
 
 \S4method{top20words}{JST_reversed.result,ANY,ANY}(x)
 
-\S4method{top20words}{JST.result,numeric,numeric}(x, topic = NULL,
-  sentiment = NULL)
+\S4method{top20words}{JST.result,numeric,numeric}(x, topic = NULL, sentiment = NULL)
 
 \S4method{top20words}{JST.result,ANY,ANY}(x)
 }
