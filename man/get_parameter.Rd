@@ -9,7 +9,7 @@ get_parameter(x, parameter = NULL)
 \arguments{
 \item{x}{A JST_reversed.result or JST.result object}
 
-\item{parameter}{Character. The parameter to be tidied and returned. 
+\item{parameter}{Character. The parameter to be tidied and returned.
 Note that no default is set.}
 }
 \value{

@@ -12,13 +12,14 @@
 #' @slot numTopics Number of topics
 #' @slot numSentiments Number of sentiment categories
 #' @slot docvars Document-level metadata from the quanteda object used as input
-JST.result <- setClass('JST.result',representation(pi = "data.frame",
-                                     theta = "data.frame",
-                                     phi = "data.frame",
-                                     phi.termScores = "data.frame",
-                                     numTopics = "numeric",
-                                     numSentiments = "numeric",
-                                     docvars = "data.frame"))
+JST.result <- setClass('JST.result',
+                       representation(pi = "data.frame",
+                                      theta = "data.frame",
+                                      phi = "data.frame",
+                                      phi.termScores = "data.frame",
+                                      numTopics = "numeric",
+                                      numSentiments = "numeric",
+                                      docvars = "data.frame"))
 
 #' Check if an object is a JST.result object
 #'
@@ -112,7 +113,7 @@ jst <- function(dfm,
   if(length(res) == 0) {return(".")}
 
   #prepare doc sentiment distribution data.frame
-  docIDs <- attr(dfm,'Dimnames')$docs
+  docID <- quanteda::docnames(dfm)
 
   pi <- as.data.frame(res$pi)
   pi <- as.data.frame(t(pi))
@@ -122,7 +123,7 @@ jst <- function(dfm,
     pi.names[i] <- paste("sent",i,sep="")
   }
   names(pi) <- pi.names
-  rownames(pi) <- docIDs
+  rownames(pi) <- docID
 
   #prepare doc sentiment/topic distribution data.frame
   theta <- as.data.frame(res$theta)
@@ -138,7 +139,7 @@ jst <- function(dfm,
 
   names(theta) <- theta.names
 
-  theta <- data.frame(docIDs,theta,row.names=NULL)
+  theta <- data.frame(docID,theta,row.names=NULL)
 
   #prepare word topic/sentiment distribtuion data.frame
   phi <- as.data.frame(res$phi)
@@ -152,8 +153,8 @@ jst <- function(dfm,
   }
   names(phi) <- phi.names
   names(phi.termScores) <- phi.names
-  rownames(phi) <- attr(dfm,'Dimnames')$features
-  rownames(phi.termScores) <- attr(dfm,'Dimnames')$features
+  rownames(phi) <- quanteda::featnames(dfm)
+  rownames(phi.termScores) <- quanteda::featnames(dfm)
 
   return(JST.result(pi = pi,
              theta = theta,
@@ -161,7 +162,7 @@ jst <- function(dfm,
              phi.termScores = phi.termScores,
              numTopics=numTopics,
              numSentiments=numSentiLabs,
-             docvars=attr(dfm,'docvars')))
+             docvars=quanteda::docvars(dfm)))
 }
 
 #' @rdname topNwords-method

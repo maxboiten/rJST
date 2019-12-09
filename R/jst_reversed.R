@@ -12,7 +12,14 @@
 #' @slot numTopics Number of topics
 #' @slot numSentiments Number of sentiment categories
 #' @slot docvars Document-level metadata from the quanteda object used as input
-JST_reversed.result <- setClass('JST_reversed.result',representation(pi = "data.frame", theta = "data.frame", phi = "data.frame",phi.termScores = "data.frame",numTopics = "numeric",numSentiments = "numeric",docvars = "data.frame"))
+JST_reversed.result <- setClass('JST_reversed.result',
+                                representation(pi = "data.frame",
+                                               theta = "data.frame",
+                                               phi = "data.frame",
+                                               phi.termScores = "data.frame",
+                                               numTopics = "numeric",
+                                               numSentiments = "numeric",
+                                               docvars = "data.frame"))
 
 #' Check if an object is a JST_reversed.result object
 #'
@@ -105,7 +112,7 @@ jst_reversed <- function(dfm,
   }
 
   #prepare doc topic distribution data.frame
-  docIDs <- attr(dfm,'Dimnames')$docs
+  docID <- quanteda::docnames(dfm)
 
   theta <- as.data.frame(res$theta)
 
@@ -114,7 +121,7 @@ jst_reversed <- function(dfm,
     theta.names[i] <- paste("topic",i,sep="")
   }
   names(theta) <- theta.names
-  rownames(theta) <- docIDs
+  rownames(theta) <- docID
 
   #prepare doc topic/sentiment distribution data.frame
   pi <- as.data.frame(res$pi)
@@ -126,18 +133,18 @@ jst_reversed <- function(dfm,
   }
   names(pi) <- pi.names
 
-  pi$docID <- docIDs
+  pi$docID <- docID
   pi$docID <- as.factor(pi$docID)
 
   topic <- numeric()
 
   for (i in c(1:numTopics)) {
-    topic <- c(topic,rep(i,dfm@Dim[1]))
+    topic <- c(topic,rep(i, quanteda::ndoc(dfm)))
   }
 
   pi$topic <- topic
 
-  pi <- pi[,c('docID','topic',pi.names)]
+  pi <- pi[,c('docID', 'topic', pi.names)]
 
   rownames(pi) <- NULL
 
@@ -153,8 +160,8 @@ jst_reversed <- function(dfm,
   }
   names(phi) <- phi.names
   names(phi.termScores) <- phi.names
-  rownames(phi) <- attr(dfm,'Dimnames')$features
-  rownames(phi.termScores) <- attr(dfm,'Dimnames')$features
+  rownames(phi) <- quanteda::featnames(dfm)
+  rownames(phi.termScores) <- quanteda::featnames(dfm)
 
   return(JST_reversed.result(pi = pi,
              theta = theta,
@@ -162,7 +169,7 @@ jst_reversed <- function(dfm,
              phi.termScores = phi.termScores,
              numTopics=numTopics,
              numSentiments=numSentiLabs,
-             docvars=attr(dfm,'docvars')))
+             docvars=quanteda::docvars(dfm)))
 }
 
 #' @rdname topNwords-method
