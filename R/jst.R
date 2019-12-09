@@ -12,14 +12,18 @@
 #' @slot numTopics Number of topics
 #' @slot numSentiments Number of sentiment categories
 #' @slot docvars Document-level metadata from the quanteda object used as input
-JST.result <- setClass('JST.result',
-                       representation(pi = "data.frame",
-                                      theta = "data.frame",
-                                      phi = "data.frame",
-                                      phi.termScores = "data.frame",
-                                      numTopics = "numeric",
-                                      numSentiments = "numeric",
-                                      docvars = "data.frame"))
+JST.result <- setClass(
+  'JST.result',
+  representation(
+    pi = "data.frame",
+    theta = "data.frame",
+    phi = "data.frame",
+    phi.termScores = "data.frame",
+    numTopics = "numeric",
+    numSentiments = "numeric",
+    docvars = "data.frame"
+  )
+)
 
 #' Check if an object is a JST.result object
 #'
@@ -29,7 +33,7 @@ JST.result <- setClass('JST.result',
 #'
 #' @export
 is.JST.result <- function(x) {
-  return(inherits(x,'JST.result'))
+  return(inherits(x, 'JST.result'))
 }
 
 #' Run a Joint Sentiment Topic model
@@ -71,7 +75,7 @@ is.JST.result <- function(x) {
 #'              numIters = 150)
 #' @export
 jst <- function(dfm,
-                sentiLexInput=NULL,
+                sentiLexInput = NULL,
                 numSentiLabs = 3,
                 numTopics = 10,
                 numIters = 3,
@@ -80,7 +84,6 @@ jst <- function(dfm,
                 beta = -1,
                 gamma = -1,
                 excludeNeutral = FALSE) {
-
   if (!any(class(dfm) == 'dfm')) {
     stop('Please input a sparse quanteda dfm object as data.')
   }
@@ -88,17 +91,18 @@ jst <- function(dfm,
   sentiWords <- integer()
   sentimentCategory <- integer()
 
-  if (!is.null(sentiLexInput)){
-    if(quanteda::is.dictionary(sentiLexInput)) {
+  if (!is.null(sentiLexInput)) {
+    if (quanteda::is.dictionary(sentiLexInput)) {
       numSentiLabs_Lex <- length(sentiLexInput)
       numSentiLabs <- numSentiLabs_Lex + 1 - excludeNeutral
 
       size <- 1
       for (i in c(1:numSentiLabs_Lex)) {
         for (word in sentiLexInput[[i]]) {
-          if(word %in% quanteda::featnames(dfm)) {
-            sentiWords[size] <- as.integer(match(word,quanteda::featnames(dfm))-1) #-1 for C++ index
-            sentimentCategory[size] <- as.integer(i-excludeNeutral)
+          if (word %in% quanteda::featnames(dfm)) {
+            sentiWords[size] <-
+              as.integer(match(word, quanteda::featnames(dfm)) - 1) #-1 for C++ index
+            sentimentCategory[size] <- as.integer(i - excludeNeutral)
             size <- size + 1
           }
         }
@@ -108,9 +112,23 @@ jst <- function(dfm,
     }
   }
 
-  res <- jstcpp(dfm,sentiWords,sentimentCategory,numSentiLabs, numTopics, numIters, updateParaStep, alpha,beta,gamma)
+  res <-
+    jstcpp(
+      dfm,
+      sentiWords,
+      sentimentCategory,
+      numSentiLabs,
+      numTopics,
+      numIters,
+      updateParaStep,
+      alpha,
+      beta,
+      gamma
+    )
 
-  if(length(res) == 0) {return(".")}
+  if (length(res) == 0) {
+    return(".")
+  }
 
   #prepare doc sentiment distribution data.frame
   docID <- quanteda::docnames(dfm)
@@ -120,7 +138,7 @@ jst <- function(dfm,
 
   pi.names = character(numSentiLabs)
   for (i in c(1:numSentiLabs)) {
-    pi.names[i] <- paste("sent",i,sep="")
+    pi.names[i] <- paste("sent", i, sep = "")
   }
   names(pi) <- pi.names
   rownames(pi) <- docID
@@ -130,25 +148,27 @@ jst <- function(dfm,
 
   theta.names <- character(numTopics)
 
-  theta.names = character(numSentiLabs*numTopics)
+  theta.names = character(numSentiLabs * numTopics)
   for (i in c(1:numSentiLabs)) {
     for (j in c(1:numTopics)) {
-      theta.names[j+numTopics*(i-1)] <- paste("topic",j,"sent",i,sep="")
+      theta.names[j + numTopics * (i - 1)] <-
+        paste("topic", j, "sent", i, sep = "")
     }
   }
 
   names(theta) <- theta.names
 
-  theta <- data.frame(docID,theta,row.names=NULL)
+  theta <- data.frame(docID, theta, row.names = NULL)
 
   #prepare word topic/sentiment distribtuion data.frame
   phi <- as.data.frame(res$phi)
   phi.termScores <- as.data.frame(res$phi.termScores)
 
-  phi.names = character(numSentiLabs*numTopics)
+  phi.names = character(numSentiLabs * numTopics)
   for (i in c(1:numSentiLabs)) {
     for (j in c(1:numTopics)) {
-      phi.names[j+numTopics*(i-1)] <- paste("topic",j,"sent",i,sep="")
+      phi.names[j + numTopics * (i - 1)] <-
+        paste("topic", j, "sent", i, sep = "")
     }
   }
   names(phi) <- phi.names
@@ -156,26 +176,30 @@ jst <- function(dfm,
   rownames(phi) <- quanteda::featnames(dfm)
   rownames(phi.termScores) <- quanteda::featnames(dfm)
 
-  return(JST.result(pi = pi,
-             theta = theta,
-             phi = phi,
-             phi.termScores = phi.termScores,
-             numTopics=numTopics,
-             numSentiments=numSentiLabs,
-             docvars=quanteda::docvars(dfm)))
+  return(
+    JST.result(
+      pi = pi,
+      theta = theta,
+      phi = phi,
+      phi.termScores = phi.termScores,
+      numTopics = numTopics,
+      numSentiments = numSentiLabs,
+      docvars = quanteda::docvars(dfm)
+    )
+  )
 }
 
 #' @rdname topNwords-method
 #' @aliases topNwords,JST.result,numeric,numeric,numeric-method
-setMethod('topNwords', c('JST.result','numeric','numeric','numeric'),
-          function(x,N,topic,sentiment) {
-            colname <- paste('topic',topic,'sent',sentiment,sep='')
+setMethod('topNwords', c('JST.result', 'numeric', 'numeric', 'numeric'),
+          function(x, N, topic, sentiment) {
+            colname <- paste('topic', topic, 'sent', sentiment, sep = '')
 
-            column <- sapply(x@phi[colname],as.numeric)
+            column <- sapply(x@phi[colname], as.numeric)
 
-            res <- rownames(x@phi)[topNwordSeeds(column,N)]
+            res <- rownames(x@phi)[topNwordSeeds(column, N)]
 
-            res <- as.data.frame(res,stringsAsFactors = FALSE)
+            res <- as.data.frame(res, stringsAsFactors = FALSE)
 
             names(res) <- colname
 
@@ -184,13 +208,13 @@ setMethod('topNwords', c('JST.result','numeric','numeric','numeric'),
 
 #' @rdname topNwords-method
 #' @aliases topNwords,JST.result,numeric,-method
-setMethod('topNwords', c('JST.result','numeric'),
-          function(x,N) {
+setMethod('topNwords', c('JST.result', 'numeric'),
+          function(x, N) {
             res <- as.data.frame(matrix(ncol = 0, nrow = N))
 
             for (topic in c(1:x@numTopics)) {
               for (sentiment in c(1:x@numSentiments)) {
-                res <- cbind(res,topNwords(x,N,topic,sentiment))
+                res <- cbind(res, topNwords(x, N, topic, sentiment))
               }
             }
 
@@ -199,14 +223,14 @@ setMethod('topNwords', c('JST.result','numeric'),
 
 #' @rdname top20words-method
 #' @aliases top20words,JST.result,numeric,numeric-method
-setMethod('top20words', c('JST.result','numeric','numeric'),
-          function(x,topic,sentiment) {
-            return(topNwords(x,20,topic,sentiment))
+setMethod('top20words', c('JST.result', 'numeric', 'numeric'),
+          function(x, topic, sentiment) {
+            return(topNwords(x, 20, topic, sentiment))
           })
 
 #' @rdname top20words-method
 #' @aliases top20words,JST.result-method
 setMethod('top20words', c('JST.result'),
           function(x) {
-            return(topNwords(x,20))
+            return(topNwords(x, 20))
           })

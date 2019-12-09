@@ -18,7 +18,10 @@ Imports: magrittr,
     RcppProgress,
     SnowballC
 Depends: methods
-Suggests: knitr, rmarkdown
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 2.1.0)
 LinkingTo: Rcpp, RcppArmadillo, RcppProgress
 Collate:
     'RcppExports.R'

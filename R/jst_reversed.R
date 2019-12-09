@@ -12,14 +12,18 @@
 #' @slot numTopics Number of topics
 #' @slot numSentiments Number of sentiment categories
 #' @slot docvars Document-level metadata from the quanteda object used as input
-JST_reversed.result <- setClass('JST_reversed.result',
-                                representation(pi = "data.frame",
-                                               theta = "data.frame",
-                                               phi = "data.frame",
-                                               phi.termScores = "data.frame",
-                                               numTopics = "numeric",
-                                               numSentiments = "numeric",
-                                               docvars = "data.frame"))
+JST_reversed.result <- setClass(
+  'JST_reversed.result',
+  representation(
+    pi = "data.frame",
+    theta = "data.frame",
+    phi = "data.frame",
+    phi.termScores = "data.frame",
+    numTopics = "numeric",
+    numSentiments = "numeric",
+    docvars = "data.frame"
+  )
+)
 
 #' Check if an object is a JST_reversed.result object
 #'
@@ -29,7 +33,7 @@ JST_reversed.result <- setClass('JST_reversed.result',
 #'
 #' @export
 is.JST_reversed.result <- function(x) {
-  return(inherits(x,'JST_reversed.result'))
+  return(inherits(x, 'JST_reversed.result'))
 }
 
 
@@ -68,7 +72,7 @@ is.JST_reversed.result <- function(x) {
 #'
 #' @export
 jst_reversed <- function(dfm,
-                         sentiLexInput=NULL,
+                         sentiLexInput = NULL,
                          numSentiLabs = 3,
                          numTopics = 10,
                          numIters = 3,
@@ -77,7 +81,6 @@ jst_reversed <- function(dfm,
                          beta = -1,
                          gamma = -1,
                          excludeNeutral = FALSE) {
-
   if (!any(class(dfm) == 'dfm')) {
     stop('Please input a sparse quanteda dfm object as data.')
   }
@@ -86,16 +89,17 @@ jst_reversed <- function(dfm,
   sentimentCategory <- integer()
 
   if (!is.null(sentiLexInput)) {
-    if(quanteda::is.dictionary(sentiLexInput)) {
+    if (quanteda::is.dictionary(sentiLexInput)) {
       numSentiLabs_Lex <- length(sentiLexInput)
       numSentiLabs <- numSentiLabs_Lex + 1 - excludeNeutral
 
       size <- 1
       for (i in c(1:numSentiLabs_Lex)) {
         for (word in sentiLexInput[[i]]) {
-          if(word %in% quanteda::featnames(dfm)) {
-            sentiWords[size] <- as.integer(match(word,quanteda::featnames(dfm))-1) #-1 for C++ index
-            sentimentCategory[size] <- as.integer(i-excludeNeutral)
+          if (word %in% quanteda::featnames(dfm)) {
+            sentiWords[size] <-
+              as.integer(match(word, quanteda::featnames(dfm)) - 1) #-1 for C++ index
+            sentimentCategory[size] <- as.integer(i - excludeNeutral)
             size <- size + 1
           }
         }
@@ -105,9 +109,21 @@ jst_reversed <- function(dfm,
     }
   }
 
-  res <- jstcppreversed(dfm,sentiWords,sentimentCategory,numSentiLabs, numTopics, numIters, updateParaStep, alpha,beta,gamma)
+  res <-
+    jstcppreversed(
+      dfm,
+      sentiWords,
+      sentimentCategory,
+      numSentiLabs,
+      numTopics,
+      numIters,
+      updateParaStep,
+      alpha,
+      beta,
+      gamma
+    )
 
-  if(length(res)==0) {
+  if (length(res) == 0) {
     return(0)
   }
 
@@ -118,7 +134,7 @@ jst_reversed <- function(dfm,
 
   theta.names = character(numTopics)
   for (i in c(1:numTopics)) {
-    theta.names[i] <- paste("topic",i,sep="")
+    theta.names[i] <- paste("topic", i, sep = "")
   }
   names(theta) <- theta.names
   rownames(theta) <- docID
@@ -129,7 +145,7 @@ jst_reversed <- function(dfm,
 
   pi.names <- character(numSentiLabs)
   for (i in c(1:numSentiLabs)) {
-    pi.names[i] <- paste('sent',i,sep='')
+    pi.names[i] <- paste('sent', i, sep = '')
   }
   names(pi) <- pi.names
 
@@ -139,12 +155,12 @@ jst_reversed <- function(dfm,
   topic <- numeric()
 
   for (i in c(1:numTopics)) {
-    topic <- c(topic,rep(i, quanteda::ndoc(dfm)))
+    topic <- c(topic, rep(i, quanteda::ndoc(dfm)))
   }
 
   pi$topic <- topic
 
-  pi <- pi[,c('docID', 'topic', pi.names)]
+  pi <- pi[, c('docID', 'topic', pi.names)]
 
   rownames(pi) <- NULL
 
@@ -152,10 +168,11 @@ jst_reversed <- function(dfm,
   phi <- as.data.frame(res$phi)
   phi.termScores <- as.data.frame(res$phi.termScores)
 
-  phi.names = character(numSentiLabs*numTopics)
+  phi.names = character(numSentiLabs * numTopics)
   for (i in c(1:numTopics)) {
     for (j in c(1:numSentiLabs)) {
-      phi.names[j+numSentiLabs*(i-1)] <- paste("topic",i,"sent",j,sep="")
+      phi.names[j + numSentiLabs * (i - 1)] <-
+        paste("topic", i, "sent", j, sep = "")
     }
   }
   names(phi) <- phi.names
@@ -163,26 +180,30 @@ jst_reversed <- function(dfm,
   rownames(phi) <- quanteda::featnames(dfm)
   rownames(phi.termScores) <- quanteda::featnames(dfm)
 
-  return(JST_reversed.result(pi = pi,
-             theta = theta,
-             phi = phi,
-             phi.termScores = phi.termScores,
-             numTopics=numTopics,
-             numSentiments=numSentiLabs,
-             docvars=quanteda::docvars(dfm)))
+  return(
+    JST_reversed.result(
+      pi = pi,
+      theta = theta,
+      phi = phi,
+      phi.termScores = phi.termScores,
+      numTopics = numTopics,
+      numSentiments = numSentiLabs,
+      docvars = quanteda::docvars(dfm)
+    )
+  )
 }
 
 #' @rdname topNwords-method
 #' @aliases topNwords,JST_reversed.result,numeric,numeric,numeric-method
-setMethod('topNwords', c('JST_reversed.result','numeric','numeric','numeric'),
-          function(x,N,topic,sentiment) {
-            colname <- paste('topic',topic,'sent',sentiment,sep='')
+setMethod('topNwords', c('JST_reversed.result', 'numeric', 'numeric', 'numeric'),
+          function(x, N, topic, sentiment) {
+            colname <- paste('topic', topic, 'sent', sentiment, sep = '')
 
-            column <- sapply(x@phi[colname],as.numeric)
+            column <- sapply(x@phi[colname], as.numeric)
 
-            res <- rownames(x@phi)[topNwordSeeds(column,N)]
+            res <- rownames(x@phi)[topNwordSeeds(column, N)]
 
-            res <- as.data.frame(res,stringsAsFactors = FALSE)
+            res <- as.data.frame(res, stringsAsFactors = FALSE)
 
             names(res) <- colname
 
@@ -191,13 +212,13 @@ setMethod('topNwords', c('JST_reversed.result','numeric','numeric','numeric'),
 
 #' @rdname topNwords-method
 #' @aliases topNwords,JST_reversed.result,numeric,-method
-setMethod('topNwords', c('JST_reversed.result','numeric'),
-          function(x,N) {
+setMethod('topNwords', c('JST_reversed.result', 'numeric'),
+          function(x, N) {
             res <- as.data.frame(matrix(ncol = 0, nrow = N))
 
             for (topic in c(1:x@numTopics)) {
               for (sentiment in c(1:x@numSentiments)) {
-                res <- cbind(res,topNwords(x,N,topic,sentiment))
+                res <- cbind(res, topNwords(x, N, topic, sentiment))
               }
             }
 
@@ -206,14 +227,14 @@ setMethod('topNwords', c('JST_reversed.result','numeric'),
 
 #' @rdname top20words-method
 #' @aliases top20words,JST_reversed.result,numeric,numeric-method
-setMethod('top20words', c('JST_reversed.result','numeric','numeric'),
-          function(x,topic,sentiment) {
-            return(topNwords(x,20,topic,sentiment))
+setMethod('top20words', c('JST_reversed.result', 'numeric', 'numeric'),
+          function(x, topic, sentiment) {
+            return(topNwords(x, 20, topic, sentiment))
           })
 
 #' @rdname top20words-method
 #' @aliases top20words,JST_reversed.result-method
 setMethod('top20words', c('JST_reversed.result'),
           function(x) {
-            return(topNwords(x,20))
+            return(topNwords(x, 20))
           })

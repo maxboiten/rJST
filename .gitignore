@@ -5,3 +5,4 @@
 *.vscode
 *.json
 *.python
+.Rproj.user
