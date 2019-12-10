@@ -4,9 +4,18 @@
 \alias{jst_reversed}
 \title{Run a reversed Joint Sentiment Topic model}
 \usage{
-jst_reversed(dfm, sentiLexInput = list(), numSentiLabs = 3,
-  numTopics = 10, numIters = 3, updateParaStep = -1, alpha = -1,
-  beta = -1, gamma = -1, excludeNeutral = FALSE)
+jst_reversed(
+  dfm,
+  sentiLexInput = NULL,
+  numSentiLabs = 3,
+  numTopics = 10,
+  numIters = 3,
+  updateParaStep = -1,
+  alpha = -1,
+  beta = -1,
+  gamma = -1,
+  excludeNeutral = FALSE
+)
 }
 \arguments{
 \item{dfm}{A quanteda dfm object}
@@ -22,7 +31,7 @@ turned off by setting \code{excludeNeutral = TRUE}.}
 
 \item{numIters}{Integer, the number of iterations (defaults to 3 for test runs, optimize by hand)}
 
-\item{updateParaStep}{Integer. The number of iterations between optimizations 
+\item{updateParaStep}{Integer. The number of iterations between optimizations
 of hyperparameter alpha}
 
 \item{alpha}{Double, hyperparameter for (defaults to .05*(average docsize/number of topics))}
@@ -37,20 +46,20 @@ to \code{TRUE}, the neutral sentiment category will be omitted. The variable is 
 dictionary is used. Defaults to \code{FALSE}.}
 }
 \value{
-A JST_reversed.result object containing a data.frame for each estimated 
+A JST_reversed.result object containing a data.frame for each estimated
 parameter
 }
 \description{
 Estimates a reversed joint sentiment topic model using a Gibbs sampler, see Details for model description.
 }
 \details{
-Lin, C., He, Y., Everson, R. and Ruger, S., 2012. Weakly supervised joint sentiment-topic 
+Lin, C., He, Y., Everson, R. and Ruger, S., 2012. Weakly supervised joint sentiment-topic
 detection from text. IEEE Transactions on Knowledge and Data engineering, 24(6), pp.1134-1145.
 }
 \examples{
-model <- jst(quanteda::dfm(quanteda::data_corpus_irishbudget2010), 
-             paradigm(), 
-             numTopics = 5, 
+model <- jst(quanteda::dfm(quanteda::data_corpus_irishbudget2010),
+             paradigm(),
+             numTopics = 5,
              numIters = 150)
 
 }

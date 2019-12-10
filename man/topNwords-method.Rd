@@ -13,13 +13,11 @@
 \usage{
 topNwords(x, N, topic = NULL, sentiment = NULL)
 
-\S4method{topNwords}{JST_reversed.result,numeric,numeric,numeric}(x, N,
-  topic = NULL, sentiment = NULL)
+\S4method{topNwords}{JST_reversed.result,numeric,numeric,numeric}(x, N, topic = NULL, sentiment = NULL)
 
 \S4method{topNwords}{JST_reversed.result,numeric,ANY,ANY}(x, N)
 
-\S4method{topNwords}{JST.result,numeric,numeric,numeric}(x, N, topic = NULL,
-  sentiment = NULL)
+\S4method{topNwords}{JST.result,numeric,numeric,numeric}(x, N, topic = NULL, sentiment = NULL)
 
 \S4method{topNwords}{JST.result,numeric,ANY,ANY}(x, N)
 }

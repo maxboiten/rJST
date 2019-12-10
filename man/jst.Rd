@@ -4,9 +4,18 @@
 \alias{jst}
 \title{Run a Joint Sentiment Topic model}
 \usage{
-jst(dfm, sentiLexInput = list(), numSentiLabs = 3, numTopics = 10,
-  numIters = 3, updateParaStep = -1, alpha = -1, beta = -1,
-  gamma = -1, excludeNeutral = FALSE)
+jst(
+  dfm,
+  sentiLexInput = NULL,
+  numSentiLabs = 3,
+  numTopics = 10,
+  numIters = 3,
+  updateParaStep = -1,
+  alpha = -1,
+  beta = -1,
+  gamma = -1,
+  excludeNeutral = FALSE
+)
 }
 \arguments{
 \item{dfm}{A quanteda dfm object}
@@ -44,17 +53,17 @@ Estimates a joint sentiment topic model using a Gibbs sampler, see Details for m
 \details{
 Basic model description:
 
-Lin, C. and He, Y., 2009, November. Joint sentiment/topic model for sentiment analysis. In 
+Lin, C. and He, Y., 2009, November. Joint sentiment/topic model for sentiment analysis. In
 Proceedings of the 18th ACM conference on Information and knowledge management (pp. 375-384). ACM.
 
 Weak supervision adopted from:
 
-Lin, C., He, Y., Everson, R. and Ruger, S., 2012. Weakly supervised joint sentiment-topic 
+Lin, C., He, Y., Everson, R. and Ruger, S., 2012. Weakly supervised joint sentiment-topic
 detection from text. IEEE Transactions on Knowledge and Data engineering, 24(6), pp.1134-1145.
 }
 \examples{
-model <- jst(quanteda::dfm(quanteda::data_corpus_irishbudget2010), 
-             paradigm(), 
-             numTopics = 5, 
+model <- jst(quanteda::dfm(quanteda::data_corpus_irishbudget2010),
+             paradigm(),
+             numTopics = 5,
              numIters = 150)
 }
