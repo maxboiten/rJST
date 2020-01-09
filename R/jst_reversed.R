@@ -188,7 +188,8 @@ jst_reversed <- function(dfm,
       phi.termScores = phi.termScores,
       numTopics = numTopics,
       numSentiments = numSentiLabs,
-      docvars = quanteda::docvars(dfm)
+      docvars = data.frame(quanteda::docvars(dfm), row.names = docID,
+                           stringsAsFactors = FALSE)
     )
   )
 }
