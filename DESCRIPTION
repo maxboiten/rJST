@@ -1,7 +1,7 @@
 Package: rJST
 Type: Package
 Title: Joint Sentiment Topic Modelling
-Version: 1.1
+Version: 1.2
 Date: 2019-12-09
 Authors@R: c(person(given='Max', family='Boiten',role=c('cre','aut'),email='max_boiten@live.nl'), 
 	person(given='Chenghua', family='Lin', role='cph'), 
