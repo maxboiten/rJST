@@ -65,5 +65,5 @@ detection from text. IEEE Transactions on Knowledge and Data engineering, 24(6),
 model <- jst(quanteda::dfm(quanteda::data_corpus_irishbudget2010),
              paradigm(),
              numTopics = 5,
-             numIters = 150)
+             numIters = 15) # Use more in practice!
 }

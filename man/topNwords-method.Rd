@@ -42,6 +42,6 @@ If topic (and sentiment for the appropriate models) are not specified, the
 top N words of every topic will be returned.
 }
 \examples{
-model <- jst(quanteda::data_dfm_lbgexample, paradigm())
+model <- jst(quanteda::dfm(quanteda::data_corpus_inaugural), paradigm())
 topNwords(model, N = 30, topic = 2, sentiment = 1)
 }
