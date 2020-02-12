@@ -95,7 +95,7 @@ get_parameter.JST_reversed.result.phi <- function(x) {
 }
 
 get_parameter.JST.result.pi <- function(x) {
-  if (length(x@docvars > 0)) {
+  if (length(x@docvars) > 0) {
     docvars <- x@docvars
     docvars$docID <- rownames(docvars)
 
@@ -107,7 +107,7 @@ get_parameter.JST.result.pi <- function(x) {
 }
 
 get_parameter.JST.result.theta <- function(x) {
-  if (length(x@docvars > 0)) {
+  if (length(x@docvars) > 0) {
     docvars <- x@docvars
     docvars$docID <- rownames(docvars)
 
