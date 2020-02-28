@@ -13,6 +13,7 @@ Description: Estimates the Joint Sentiment Topic model and its reversed variety,
 License: GPL-3
 Imports: magrittr,
     quanteda,
+    quanteda.textmodels,
     reshape2,
     Rcpp,
     RcppProgress,
